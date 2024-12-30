@@ -1,0 +1,63 @@
+body {
+  margin: 0;
+  font-family: 'Hind', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  font-family: "Hind", serif;
+  margin: 0;
+}
+
+h1 h2 h3 h4 h5 h6 {
+  font-family: 'Lora', serif !important;
+  margin: 0;
+}
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.section-icon {
+  background-color: #D3E8FF;
+  padding: 1rem;
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+}
+
+.navigation {
+  background-color: #285F9E;
+  width: 100%;
+  color: white;
+}
+
+.navigation a {
+  color: white;
+  text-decoration: none;
+}
+
+.navigation img {
+  width: 5rem;
+  height: 5rem;
+}
+
+
+.member-card .member-image {
+  border-radius: 50%; /* Initially rounded */
+  transition: border-radius 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+
+.member-card:hover .member-image {
+  border-radius: 0; /* Change border-radius to 0 to make it squared */
+  transform: scale(1.1); /* Zoom into the image */
+}
