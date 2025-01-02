@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllArticles, getAllMembers, getAllMinutes, getEvents } from "../../services/services";
 import { useNavigate } from "react-router";
+import axios from "axios";
 
 const List = () => {
   const [members, setMembers] = useState([]);
@@ -139,11 +140,20 @@ const List = () => {
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
               onClick={() => navigate(`/admin/event/`, { state: { id: event.id } })}   
             >Edit</button>
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">Delete</button>
+            <button onClick={() => onDeleteEvent(event)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">Delete</button>
           </td>
         </tr>
       );
     });
+  }
+
+  const onDeleteEvent = async (event) => 
+  {
+    try{
+      await axios.delete(`http://localhost:3001/events/${event.id}`);
+    } catch (error){
+      console.error("Error deleting event data:", error);
+    }
   }
 
   useEffect(() => {
@@ -152,6 +162,10 @@ const List = () => {
     getMinutes();
     getEventsItems();
   }, []);
+
+  useEffect(() => {
+    getEventsItems();
+  }, [events]);
 
   return (
     <div className="container mx-auto p-4">
@@ -225,7 +239,7 @@ const List = () => {
           <h2 className="text-2xl font-semibold mt-4">Events</h2>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/admin/events/`)}
+            onClick={() => navigate(`/admin/event/`)}
           >Add Event</button>
           </div>
 

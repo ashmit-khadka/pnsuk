@@ -12,8 +12,7 @@ import List from './components/admin/List';
 import ArticleForm from './components/admin/ArticleForm';
 import MemberForm from './components/admin/MembersForm';
 import MinuteForm from './components/admin/MinutesForm';
-import EventsForm from './components/admin/EventForm';
-import AboutScreen from './components/screens/AboutScreen';
+import EventForm from './components/admin/EventForm';
 
 
 function App() {
@@ -32,6 +31,7 @@ function App() {
           <Route path="admin/member" element={<MemberForm />} />
           <Route path="admin/minute" element={<MinuteForm />} />
           <Route path="about" element={<AboutScreen />} />
+          <Route path="admin/event" element={<EventForm />} />
 
           {/* <Route element={<AuthLayout />}>
     <Route path="login" element={<Login />} />
