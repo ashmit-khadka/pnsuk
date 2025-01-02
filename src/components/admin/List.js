@@ -90,7 +90,7 @@ const List = () => {
           <td>{article.title}</td>
           <td>
             {article.image}
-            <img src={`http://localhost:3000/assets/media/article/${article.image}`} alt={article.title} className="w-10 h-10" />
+            <img src={`http://localhost:3000/assets/media/images/articles/${article.image}`} alt={article.title} className="w-10 h-10" />
           </td>
           <td>{article.date}</td>
           <td>
@@ -160,7 +160,7 @@ const List = () => {
           <h2 className="text-2xl font-semibold mt-4">Articles</h2>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/article/`)}
+            onClick={() => navigate(`/admin/article/`)}
           >Add Article</button>
         </div>
         <table className="min-w-full bg-white border border-gray-200 mt-4">
@@ -180,7 +180,7 @@ const List = () => {
           <h2 className="text-2xl font-semibold mt-4">Members</h2>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/member/`)}
+            onClick={() => navigate(`/admin/member/`)}
           >Add Member</button>
         </div>
         <table className="min-w-full bg-white border border-gray-200 mt-4">
@@ -201,7 +201,7 @@ const List = () => {
           <h2 className="text-2xl font-semibold mt-4">Minutes</h2>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/minute/`)}
+            onClick={() => navigate(`/admin/minute/`)}
           >Add Minute</button>
           </div>
 
@@ -225,7 +225,7 @@ const List = () => {
           <h2 className="text-2xl font-semibold mt-4">Events</h2>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/events/`)}
+            onClick={() => navigate(`/admin/events/`)}
           >Add Event</button>
           </div>
 

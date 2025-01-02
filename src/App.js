@@ -13,13 +13,14 @@ import ArticleForm from './components/admin/ArticleForm';
 import MemberForm from './components/admin/MembersForm';
 import MinuteForm from './components/admin/MinutesForm';
 import EventsForm from './components/admin/EventForm';
+import AboutScreen from './components/screens/AboutScreen';
 
 
 function App() {
   return (
     <div className='flex flex-col items-center pt-24'>
       <Navigation />
-      <div className='max-w-screen-xl margin-auto'>
+      <div className='w-page margin-auto'>
         <Routes>
           <Route index element={<HomeScreen />} />
           <Route path="articles" element={<ArticlesScreen />} />
@@ -30,6 +31,7 @@ function App() {
           <Route path="admin/article" element={<ArticleForm />} />
           <Route path="admin/member" element={<MemberForm />} />
           <Route path="admin/minute" element={<MinuteForm />} />
+          <Route path="about" element={<AboutScreen />} />
 
           {/* <Route element={<AuthLayout />}>
     <Route path="login" element={<Login />} />

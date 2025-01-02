@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { ReactComponent as IconLocation } from '../../assets/icons/location.svg';
 import { ReactComponent as IconDate } from '../../assets/icons/date.svg';
 import { ReactComponent as IconContact } from '../../assets/icons/phone.svg';
+import { ReactComponent as IconScribble } from '../../assets/icons/scribble.svg';
 import axios from "axios";
 import Article from "../Article";
 import Member from "../Member";
+import Carousel from 'react-bootstrap/Carousel';
 
 const HomeScreen = () => {
 
@@ -36,24 +38,12 @@ const HomeScreen = () => {
     date,
     contact,
   }) => (
-    <div className="w-80 flex flex-col gap-2 p-8 border border-gray-200 rounded-lg">
-      <h3 className="font-bold">{title}</h3>
-      <p className="flex gap-2 items-center"><IconLocation className="w-4 h-4" /> {location}</p>
-      <p className="flex gap-2 items-center"><IconDate className="w-4 h-4" /> {date}</p>
-      <p className="flex gap-2 items-center"><IconContact className="w-4 h-4" /> {date}</p>
+    <div className="home-upcomming-event flex flex-col p-8 rounded-lg">
+      <h3 className="font-bold text-lg">{title}</h3>
+      <p className="flex gap-2 items-center"><IconLocation className="w-4 h-4 fill-white" /> {location}</p>
+      <p className="flex gap-2 items-center"><IconDate className="w-4 h-4 fill-white" /> {date}</p>
+      <p className="flex gap-2 items-center"><IconContact className="w-4 h-4 fill-white" /> {date}</p>
       <p>{description.length > 100 ? `${description.substring(0, 100)}...` : description}</p>
-    </div>
-  )
-
-  const TeamItem = ({
-    name,
-    role,
-    pic,
-  }) => (
-    <div className="flex flex-col items-center">
-      <img className="rounded-full mb-4" src="https://via.placeholder.com/150" alt="placeholder" />
-      <p className="font-bold">{name}</p>
-      <p>{role}</p>
     </div>
   )
 
@@ -76,11 +66,20 @@ const HomeScreen = () => {
           </button>
         </div>
         <div className="flex-1">
-          <img src="https://via.placeholder.com/500" alt="placeholder" />
+
+          <Carousel>
+            {data?.images?.map((article) => 
+              <Carousel.Item>
+                <img key={article.id} src={`http://localhost:3000/assets/media/images/articles/${article.images[0].image}`} alt={article.title} />
+              </Carousel.Item>
+            )  
+          }
+          </Carousel>
+
         </div>
       </div>
 
-      <div className="w-full  pt-4 px-8 pb-8 shadow-xl rounded-lg">
+      <div className="w-full pt-4 px-8 pb-8 shadow-xl rounded-lg">
         <h2 className="text-2xl font-bold text-center p-4">What we do</h2>
         <div className="flex flex-row justify-around">
           <WhatWeDoItem
@@ -102,9 +101,9 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      <div className="w-full  pt-4 px-8 pb-8 flex flex-col gap-16 items-center">
-        <h2 className="text-2xl font-bold">Our upcoming events</h2>
-        <div className="w-full flex flex-row justify-around">
+      <div className="home-upcomming-events w-full  pt-4 px-24 pb-8 flex flex-col gap-16 items-center">
+        <h2 className="text-2xl font-bold font-lora text-3xl">Our upcoming events</h2>
+        <div className="w-full flex flex-row justify-around gap-4">
           {
             data?.events?.map((event) => (
               <EventItem
@@ -118,9 +117,10 @@ const HomeScreen = () => {
             )}
         </div>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> View more</button>
+        <IconScribble className="home-upcomming-events-scribble" />
       </div>
 
-      <div className="grid grid-cols-3 gap-16 w-full ">
+      <div className="mt-24 grid grid-cols-3 gap-16 w-full ">
         <div className="col-span-1 flex flex-col justify-center gap-4">
           <h2 className="text-4xl">How we have supported the community</h2>
           <p>Our work is made possible by the generous support of our sponsors and donors. We are grateful for their contributions and commitment to helping us make a difference in the community.</p>
@@ -141,7 +141,7 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      <div className="w-full  pt-4 px-8 pb-8 flex flex-col gap-16 items-center">
+      <div className="w-full pt-4 px-8 pb-8 flex flex-col gap-16 items-center">
         <h2 className="text-2xl font-bold">Meet our team</h2>
         <div className="flex flex-row w-full justify-around">
           <Member

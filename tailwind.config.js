@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       width: {
-        'page': '92rem',
+        'page': '80rem',
       },
       fontFamily: {
         hind: ['Hind', 'serif'],

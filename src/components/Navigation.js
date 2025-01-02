@@ -49,7 +49,7 @@ const Navigation = () => {
               <NavLink to="/committee">Committee</NavLink>
             </Nav.Link>
             <Nav.Link href="#home">
-              <NavLink to="/committee">About us</NavLink>
+              <NavLink to="/about">About us</NavLink>
             </Nav.Link>
             <Nav.Link href="#home">
               <NavLink to="/committee">Contact us</NavLink>

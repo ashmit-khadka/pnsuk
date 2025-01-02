@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Member from "../Member";
+import { getAllMembers } from "../../services/services";
 
 const CommitteeScreen = () => {
 
@@ -13,19 +14,18 @@ const CommitteeScreen = () => {
 
 
   useEffect(() => {
-    axios.get('http://localhost:3001/members')
+    getAllMembers()
       .then((response) => {
-        const management = response.data.filter(member => member.role === 'Management');
-        const trustee = response.data.filter(member => member.role === 'Trustee');
-        const members = response.data.filter(member => member.role === 'Member');
-        const volunteers = response.data.filter(member => member.role === 'Volunteer');
+        const management = response.filter(member => member.role === 'Management');
+        const trustee = response.filter(member => member.role === 'Trustee');
+        const members = response.filter(member => member.role === 'Member');
+        const volunteers = response.filter(member => member.role === 'Volunteer');
         setCommittee({
           management,
           trustee,
           members,
           volunteers
         });
-        console.log(response.data);
       })
   }, []);
 

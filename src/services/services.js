@@ -123,11 +123,11 @@ const submitMember = async (id, data, image, mode) => {
   return response.data;
 };
 
-const submitArticle = async (id, data, images, mode) => {
+const submitArticle = async (data, images) => {
     const formData = new FormData();
 
     // Append text fields to formData
-    if (data.id) {
+    if (data?.id) {
       formData.append("id", data.id);
     }
     formData.append("title", data.title);
@@ -139,6 +139,7 @@ const submitArticle = async (id, data, images, mode) => {
     formData.append("is_project", data.is_project);
     formData.append("is_home", data.is_home);
     formData.append("is_sport", data.is_sport);
+    formData.append("type", "article");
 
 
     // Append the selected images to formData
@@ -150,10 +151,12 @@ const submitArticle = async (id, data, images, mode) => {
         formData.append("existing_images[]", image.image);
       }
     });
+
     try {
-      const response = await axios.post("http://localhost:3001/upload", formData, {
+      const response = await axios.post("http://localhost:3001/article", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
+      return response.data;
     } catch (error) {
       console.error("Error uploading files and text data:", error);
     }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router';
 import { fetch } from "../../services/services";
 import Article from "../Article";
+import Carousel from 'react-bootstrap/Carousel';
 
 
 const ArticleScreen = (props) => {
@@ -25,12 +26,24 @@ const ArticleScreen = (props) => {
   return (
     <div>
       <div>
-      <h1>{article.title}</h1>
-      <p>{article.date}</p>
-      <p>{article.text}</p>
-      {article.images && article.images.map((image) => 
-        <img key={image.id} src={`http://localhost:3000/assets/media/article/${image.image}`} alt={image.title} />
-      )}
+        <h1>{article.title}</h1>
+        <p>{article.date}</p>
+        <Carousel>
+          {article.images && article.images.map((image) =>
+            <Carousel.Item>
+              <img key={image.id} src={`http://localhost:3000/assets/media/images/articles/${image.image}`} alt={image.title} />
+
+              {/* <Carousel.Caption>
+                <h3>First slide label</h3>
+                <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+              </Carousel.Caption> */}
+            </Carousel.Item>
+          )}
+        </Carousel>
+
+        <p>{article.text}</p>
+
+
 
       </div>
       <div>
