@@ -13,7 +13,7 @@ import ArticleForm from './components/admin/ArticleForm';
 import MemberForm from './components/admin/MembersForm';
 import MinuteForm from './components/admin/MinutesForm';
 import EventForm from './components/admin/EventForm';
-
+import AboutScreen from './components/screens/AboutScreen';
 
 function App() {
   return (
