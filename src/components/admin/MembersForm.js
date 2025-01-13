@@ -34,7 +34,7 @@ const MemberForm = (props) => {
     });
     setSelectedImage({
       name: data.image,
-      preview: `http://localhost:3000/assets/images/${data.image}`
+      preview: `${process.env.REACT_APP_API}/assets/images/${data.image}`
     })
   }
 

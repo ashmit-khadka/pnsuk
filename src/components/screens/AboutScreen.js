@@ -35,44 +35,44 @@ const AboutScreen = () => {
         {aboutSection(
           "PNS at a Glance",
           "Our mission is to provide the best service to our customers.",
-          "http://localhost:3000/assets/media/images/about/pexels-photo-669986.jpeg",
+          `${process.env.REACT_APP_API}/assets/media/images/about/pexels-photo-669986.jpeg`,
           false,
-          "http://localhost:3000/assets/media/docs/about/PNS_glance.pdf"
+          `${process.env.REACT_APP_API}/assets/media/docs/about/PNS_glance.pdf`
         )}
         {aboutSection(
           "Constitution",
           "Our mission is to provide the best service to our customers.",
-          "http://localhost:3000/assets/media/images/about/pexels-photo-2104882.jpeg",
+          `${process.env.REACT_APP_API}/assets/media/images/about/pexels-photo-2104882.jpeg`,
           false,
-          "http://localhost:3000/assets/media/docs/about/constitution.pdf"
+          `${process.env.REACT_APP_API}/assets/media/docs/about/constitution.pdf`
         )}
         {aboutSection(
           "PNS Property Acquisition Proposal",
           "Our mission is to provide the best service to our customers.",
-          "http://localhost:3000/assets/media/images/about/pexels-photo-1370704.jpeg",
+          `${process.env.REACT_APP_API}/assets/media/images/about/pexels-photo-1370704.jpeg`,
           true,
-          "http://localhost:3000/assets/media/docs/about/PNS_Property_Acquisition_Proposal.pdf"
+          `${process.env.REACT_APP_API}/assets/media/docs/about/PNS_Property_Acquisition_Proposal.pdf`
         )}
         {aboutSection(
           "Donation Fund Collection Policy",
           "Our mission is to provide the best service to our customers.",
-          "http://localhost:3000/assets/media/images/about/pexels-photo-5942584.jpeg",
+          `${process.env.REACT_APP_API}/assets/media/images/about/pexels-photo-5942584.jpeg`,
           true,
-          "http://localhost:3000/assets/media/docs/about/Donation_Fund_Collection_Policy.pdf"
+          `${process.env.REACT_APP_API}/assets/media/docs/about/Donation_Fund_Collection_Policy.pdf`
         )}
         {aboutSection(
           "PNS Safeguarding Policy",
           "Our mission is to provide the best service to our customers.",
-          "http://localhost:3000/assets/media/images/about/pexels-photo-609771.jpeg",
+          `${process.env.REACT_APP_API}/assets/media/images/about/pexels-photo-609771.jpeg`,
           false,
-          "http://localhost:3000/assets/media/docs/about/PNS_Safeguarding_Policy.pdf"
+          `${process.env.REACT_APP_API}/assets/media/docs/about/PNS_Safeguarding_Policy.pdf`
         )}
         {aboutSection(
           "Health and Safety Policy",
           "Our mission is to provide the best service to our customers.",
-          "http://localhost:3000/assets/media/images/about/pexels-photo-669986.jpeg",
+          `${process.env.REACT_APP_API}/assets/media/images/about/pexels-photo-669986.jpeg`,
           false,
-          "http://localhost:3000/assets/media/docs/about/Health_and_Safety_Policy.pdf"
+          `${process.env.REACT_APP_API}/assets/media/docs/about/Health_and_Safety_Policy.pdf`
         )}
 
       </div>

@@ -30,7 +30,7 @@ const MinutesScreen = () => {
   };
 
   const onOpenMinute = (minute) => {
-    window.open(`http://localhost:3000/assets/media/docs/minutes/${minute.title}`, "_blank");
+    window.open(`${process.env.REACT_APP_API}/assets/media/docs/minutes/${minute.title}`, "_blank");
     
 
   } 
