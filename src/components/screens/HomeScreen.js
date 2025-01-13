@@ -18,10 +18,9 @@ const HomeScreen = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/home')
+    axios.get(`${process.env.REACT_APP_API}/home`)
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
       })
   }, []);
 
@@ -112,7 +111,7 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      <div className="home-upcomming-events w-full  pt-4 px-8 lg:px-24 pb-8 flex flex-col gap-8 items-center mb-24">
+      <div className="home-upcomming-events w-full  pt-4 px-8 lg:px-16 pb-8 flex flex-col gap-8 items-center mb-24">
         <h2 className="font-lora text-3xl font-bold text-center p-4 text-white">Our upcoming events</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
           {
@@ -136,7 +135,7 @@ const HomeScreen = () => {
         <div className="col-span-1 flex flex-col justify-center gap-4">
           <h2 className="text-4xl font-lora">How we have supported the community</h2>
           <p>Our work is made possible by the generous support of our sponsors and donors. We are grateful for their contributions and commitment to helping us make a difference in the community.</p>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Become a sponsor</button>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> View more</button>
         </div>
         <div className="col-span-1 md:col-span-2 grid gap-8 grid-cols-1 grid-rows-4 md:grid-cols-2 md:grid-rows-2">
           {
@@ -196,9 +195,9 @@ const HomeScreen = () => {
           }
         </div>
         <div className="col-span-1 flex flex-col justify-center gap-4">
-          <h2 className="text-4xl font-lora">How we have supported the community</h2>
-          <p>Our work is made possible by the generous support of our sponsors and donors. We are grateful for their contributions and commitment to helping us make a difference in the community.</p>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Become a sponsor</button>
+          <h2 className="text-4xl font-lora">See what we've been up to</h2>
+          <p>Take a look at what we've been up to and the events we've hosted. We're proud to share our journey with you.</p>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> View more</button>
         </div>
       </div>
 

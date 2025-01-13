@@ -5,6 +5,7 @@ import { ReactComponent as IconLocation } from '../../assets/icons/noun-location
 import { ReactComponent as IconCalendar } from '../../assets/icons/noun-calendar.svg';
 import { ReactComponent as IconPhone } from '../../assets/icons/noun-phone.svg';
 import Event from "../Event";
+import Breadcrumbs from "../Breadcrumbs";
 
 const EventsScreen = () => {
   const [events, setEvents] = useState([]);
@@ -92,6 +93,13 @@ const EventsScreen = () => {
 
   return (
     <div>
+      <Breadcrumbs
+        Items={[
+          { href: '/', text: 'Home' },
+          { href: '/events', text: 'Events' }
+        ]}
+      />
+
       <h1 className="font-lora mb-8 text-center">Events</h1>
       {sortedMonths.map(month => (
         <div className="mt-8" key={month}>

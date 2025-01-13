@@ -3,7 +3,7 @@ import axios from "axios";
 import formModeEnum from "./formModeEnum";
 
 const getAllArticles = async () => {
-  const response = await axios.get("http://localhost:3001/articles");
+  const response = await axios.get(`${process.env.REACT_APP_API}/articles`);
   return response.data;
 }
 
@@ -17,12 +17,12 @@ const getAllArticleSelectionItems = async () => {
 }
 
 const getArticle = async (id) => {
-  const response = await axios.get(`http://localhost:3001/article/${id}`);
+  const response = await axios.get(`${process.env.REACT_APP_API}/article/${id}`);
   return response.data;
 }
 
 const getAllMembers = async () => {
-  const response = await axios.get("http://localhost:3001/members");
+  const response = await axios.get(`${process.env.REACT_APP_API}/members`);
   return response.data;
 }
 
@@ -36,23 +36,23 @@ const getAllMemberSelectionItems = async () => {
 }
 
 const getMember = async (id) => {
-  const response = await axios.get(`http://localhost:3001/member/${id}`);
+  const response = await axios.get(`${process.env.REACT_APP_API}/member/${id}`);
   return response.data;
 }
 
 
 const getAllMinutes = async () => {
-  const response = await axios.get("http://localhost:3001/minutes");
+  const response = await axios.get(`${process.env.REACT_APP_API}/minutes`);
   return response.data;
 }
 
 const getMinute = async (id) => {
-  const response = await axios.get(`http://localhost:3001/minute/${id}`);
+  const response = await axios.get(`${process.env.REACT_APP_API}/minute/${id}`);
   return response.data;
 }
 
 const getAllEvents = async () => {
-  const response = await axios.get("http://localhost:3001/events");
+  const response = await axios.get(`${process.env.REACT_APP_API}/events`);
   return response.data;
 }
 
@@ -78,11 +78,11 @@ const submitMinute = async (id, data, document, mode) => {
 
   let response;
   if (mode === formModeEnum.CREATE) {
-    response = await axios.post("http://localhost:3001/minutes", formData, {
+    response = await axios.post(`${process.env.REACT_APP_API}/minutes`, formData, {
       headers: { "Content-Type": "multipart/form-data" }
     });
   } else if (mode === formModeEnum.UPDATE) {
-    response = await axios.put(`http://localhost:3001/minutes/${id}`, formData, {
+    response = await axios.put(`${process.env.REACT_APP_API}/minutes/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" }
     });
   }
@@ -111,11 +111,11 @@ const submitMember = async (id, data, image, mode) => {
 
   let response;
   if (mode === formModeEnum.CREATE) {
-    response = await axios.post("http://localhost:3001/member", formData, {
+    response = await axios.post(`${process.env.REACT_APP_API}/member`, formData, {
       headers: { "Content-Type": "multipart/form-data" }
     });
   } else if (mode === formModeEnum.UPDATE) {
-    response = await axios.put(`http://localhost:3001/member/${id}`, formData, {
+    response = await axios.put(`${process.env.REACT_APP_API}/member/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" }
     });
   }
@@ -153,22 +153,22 @@ const submitArticle = async (data, images) => {
     });
 
     try {
-      const response = await axios.post("http://localhost:3001/article", formData, {
+      const response = await axios.post(`${process.env.REACT_APP_API}/article`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       return response.data;
     } catch (error) {
-      console.error("Error uploading files and text data:", error);
+
     }
   };
 
 
   const deleteArticleImage = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:3001/article/image/${id}`);
-      console.log(response.data);
+      const response = await axios.delete(`${process.env.REACT_APP_API}/article/image/${id}`);
+      return response.data;
     } catch (error) {
-      console.error("Error deleting image:", error);
+
     }
   }
 

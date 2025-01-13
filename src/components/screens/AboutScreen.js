@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "react-bootstrap";
+import Breadcrumbs from "../Breadcrumbs";
 
 const AboutScreen = () => {
 
@@ -23,6 +24,12 @@ const AboutScreen = () => {
 
   return (
     <div>
+      <Breadcrumbs
+        Items={[
+          { href: '/', text: 'Home' },
+          { href: '/about', text: 'About' }
+        ]}
+      />
       <h1 className="font-lora text-5xl text-center pb-16">About Us</h1>
       <div className="flex flex-col gap-8">
         {aboutSection(

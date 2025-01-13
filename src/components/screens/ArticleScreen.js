@@ -3,6 +3,7 @@ import { useParams } from 'react-router';
 import { fetch } from "../../services/services";
 import Article from "../Article";
 import Carousel from 'react-bootstrap/Carousel';
+import Breadcrumbs from "../Breadcrumbs";
 
 
 const ArticleScreen = (props) => {
@@ -25,6 +26,14 @@ const ArticleScreen = (props) => {
 
   return (
     <div>
+      <Breadcrumbs
+        Items={[
+          { href: '/', text: 'Home' },
+          { href: '/articles', text: 'Articles' },
+          { text: article.title }
+        ]}
+      />
+      
       <div>
         <h1 className="font-lora font-bold mb-4">{article.title}</h1>
         <div className="flex items-center gap-4">
