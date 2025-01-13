@@ -6,6 +6,8 @@ const app = express();
 const port = 3001;
 const multer = require("multer");
 const lodash = require('lodash');
+const path = require('path');
+
 
 const defaultEvents = require('./backup/defaults/events.json');
 
@@ -38,8 +40,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+const dbPath = path.join(__dirname, 'db.sqlite3');
+const dbPathBackup = path.join(__dirname, 'backup/db.sqlite3');
+
+
 // Connect to the database
-const db = new sqlite3.Database('C:/Users/ashmi/Documents/Projects/pnsuk/server/db.sqlite3', (err) => {
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error(err.message);
     return;
@@ -48,7 +54,7 @@ const db = new sqlite3.Database('C:/Users/ashmi/Documents/Projects/pnsuk/server/
 });
 
 // Connect to old the database (for migration only)
-const db_old = new sqlite3.Database('C:/Users/ashmi/Documents/Projects/pnsuk/server/backup/db_old.sqlite3', (err) => {
+const db_old = new sqlite3.Database(dbPathBackup, (err) => {
   if (err) {
     console.error(err.message);
     return;
