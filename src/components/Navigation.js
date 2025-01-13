@@ -43,6 +43,9 @@ const Navigation = () => {
               <NavLink to="/">Home</NavLink>
             </Nav.Link>
             <Nav.Link href="#home">
+              <NavLink to="/events">Events</NavLink>
+            </Nav.Link>
+            <Nav.Link href="#home">
               <NavLink to="/articles">Articles</NavLink>
             </Nav.Link>
             <Nav.Link href="#home">
@@ -51,13 +54,13 @@ const Navigation = () => {
             <Nav.Link href="#home">
               <NavLink to="/about">About us</NavLink>
             </Nav.Link>
-            <Nav.Link href="#home">
+            {/* <Nav.Link href="#home">
               <NavLink to="/committee">Contact us</NavLink>
-            </Nav.Link>
-            <Nav.Link href="#home">
+            </Nav.Link> */}
+            {/* <Nav.Link href="#home">
               <NavLink to="/admin">Login</NavLink>
-            </Nav.Link>
-            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
+            </Nav.Link> */}
+            {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">
                 Another action
@@ -67,7 +70,7 @@ const Navigation = () => {
               <NavDropdown.Item href="#action/3.4">
                 Separated link
               </NavDropdown.Item>
-            </NavDropdown>
+            </NavDropdown> */}
           </Nav>
         </Navbar.Collapse>
       </Container>

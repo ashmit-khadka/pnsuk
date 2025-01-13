@@ -7,6 +7,8 @@ const port = 3001;
 const multer = require("multer");
 const lodash = require('lodash');
 
+const defaultEvents = require('./backup/defaults/events.json');
+
 // Set up storage with Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -668,7 +670,7 @@ app.get('/migrate', async (req, res) => {
   await dbRunAsync('CREATE TABLE article_images (id TEXT PRIMARY KEY, article TEXT, image TEXT);', db);
   await dbRunAsync('CREATE TABLE members (id TEXT PRIMARY KEY, name TEXT, image TEXT, role TEXT, position TEXT, "order" INTEGER);', db);
   await dbRunAsync('CREATE TABLE minutes (id TEXT PRIMARY KEY, "title" TEXT, file TEXT, description TEXT, date TEXT);', db);
-  await dbRunAsync('CREATE TABLE events (id TEXT PRIMARY KEY, title TEXT, description TEXT, date TEXT, "location" TEXT, "contact" TEXT);', db);
+  await dbRunAsync('CREATE TABLE events (id TEXT PRIMARY KEY, title TEXT, description TEXT, timestamp TEXT, "location" TEXT, "contact" TEXT, recurring TEXT);', db);
   await dbRunAsync('CREATE TABLE login (id TEXT PRIMARY KEY, username TEXT, password TEXT);', db);
 
   articles.forEach(async article => {
@@ -692,9 +694,10 @@ app.get('/migrate', async (req, res) => {
     await dbRunAsync('INSERT INTO members (id, name, image, role, position, "order") VALUES (?, ?, ?, ?, ?, ?);', db, [memberId, member.name, formatedImage, role, member.position, member.order]);
   });
 
-  events.forEach(async event => {
+
+  defaultEvents.forEach(async event => {
     const eventId = uuidv4();
-    await dbRunAsync('INSERT INTO events (id, title, description, date, "location", "contact") VALUES (?, ?, ?, ?, ?, ?);', db, [eventId, event.title, event.description, event.date, event.location, event.contact]);
+    await dbRunAsync('INSERT INTO events (id, title, description, timestamp, "location", "contact", recurring) VALUES (?, ?, ?, ?, ?, ?, ?);', db, [eventId, event.title, event.description, event.timestamp, event.location, event.contact, event.recurring]);
   });
 
   minutes.forEach(async minute => {
@@ -751,7 +754,7 @@ app.get('/home', async (req, res) => {
   const memeberPresident = await dbAllAsync('SELECT * FROM members WHERE position = "President and Trustee" LIMIT 1;', db);
   const memberVicePresident = await dbAllAsync('SELECT * FROM members WHERE position = "Vice President" LIMIT 2;', db);
   const memberCoordinator = await dbAllAsync('SELECT * FROM members WHERE position = "Coordinator" LIMIT 1;', db);
-  const events = await dbAllAsync('SELECT * FROM events ORDER BY date DESC LIMIT 3;', db);
+  const events = await dbAllAsync('SELECT * FROM events ORDER BY timestamp DESC LIMIT 3;', db);
 
 
   const data = {

@@ -26,8 +26,16 @@ const ArticleScreen = (props) => {
   return (
     <div>
       <div>
-        <h1>{article.title}</h1>
-        <p>{article.date}</p>
+        <h1 className="font-lora font-bold mb-4">{article.title}</h1>
+        <div className="flex items-center gap-4">
+          <img className="w-12 h-12 rounded-full" src={`http://localhost:3000/assets/media/images/articles/${article.images && article.images[0].image}`} alt={article.title} />
+          <div>
+            <p className="m-0" >{"By Peterborough Nepalese Society"}</p>
+            <time>{article.date}</time>
+          </div>
+        </div>
+        <p className="mt-8 mb-4">{article.text}</p>
+
         <Carousel>
           {article.images && article.images.map((image) =>
             <Carousel.Item>
@@ -41,13 +49,12 @@ const ArticleScreen = (props) => {
           )}
         </Carousel>
 
-        <p>{article.text}</p>
 
 
 
       </div>
       <div>
-        <h2>Related Articles</h2>
+        <h2 className="mt-16 mb-4 font-lora">Related Articles</h2>
         <div className="grid grid-cols-4 gap-8">
           {articleSuggestions?.map((article) => (
             <Article

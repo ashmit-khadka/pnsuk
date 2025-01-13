@@ -31,11 +31,11 @@ const CommitteeScreen = () => {
 
   const section = (title, description, people) => (
     <div>
-      <div>
+      <div className="bg-gradient-to-r from-themeDark to-themePrimary text-white p-12 relative mb-12 rounded-lg">
         <h2>{title}</h2>
         <p>{description}</p>
       </div>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {people.map(person => (
           <Member
             key={person.id}
@@ -50,7 +50,7 @@ const CommitteeScreen = () => {
 
   return (
     <div>
-      <h1>Committee</h1>
+      <h1 className="font-lora mb-8 text-center">Committee</h1>
       {section(
         'Management',
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',

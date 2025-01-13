@@ -51,7 +51,7 @@ const getMinute = async (id) => {
   return response.data;
 }
 
-const getEvents = async () => {
+const getAllEvents = async () => {
   const response = await axios.get("http://localhost:3001/events");
   return response.data;
 }
@@ -192,7 +192,7 @@ export {
   getArticle,
   getMember,
   getAllMinutes,
-  getEvents,
+  getAllEvents,
   submitMinute,
   getMinute,
   submitMember,

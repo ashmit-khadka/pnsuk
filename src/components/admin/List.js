@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getAllArticles, getAllMembers, getAllMinutes, getEvents } from "../../services/services";
+import { getAllArticles, getAllMembers, getAllMinutes, getAllEvents } from "../../services/services";
 import { useNavigate } from "react-router";
 import axios from "axios";
 
@@ -57,7 +57,7 @@ const List = () => {
   }
 
   const getEventsItems = async () => {
-    const events = await getEvents();
+    const events = await getAllEvents();
     setEvents(events);
   }
 
