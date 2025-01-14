@@ -794,7 +794,12 @@ app.get('/article-screen/:id', async (req, res) => {
   res.json(data);  
 });
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'development') {
+  // Create HTTP server
+  http.createServer(app).listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+} else {
   const options = {
     key: fs.readFileSync(path.join(__dirname, 'server.key')),
     cert: fs.readFileSync(path.join(__dirname, 'server.cert'))
@@ -803,11 +808,6 @@ if (process.env.NODE_ENV === 'production') {
   // Create HTTPS server
   https.createServer(options, app).listen(port, () => {
     console.log(`Server is running on https://localhost:${port}`);
-  });
-} else {
-  // Create HTTP server
-  http.createServer(app).listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
   });
 }
 
