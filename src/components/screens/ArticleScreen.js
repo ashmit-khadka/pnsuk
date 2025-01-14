@@ -37,7 +37,7 @@ const ArticleScreen = (props) => {
       <div>
         <h1 className="font-lora font-bold mb-4">{article.title}</h1>
         <div className="flex items-center gap-4">
-          <img className="w-12 h-12 rounded-full" src={`${process.env.REACT_APP_API}/assets/media/images/articles/${article.images && article.images[0].image}`} alt={article.title} />
+          <img className="w-12 h-12 rounded-full" src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${article.images && article.images[0].image}`} alt={article.title} />
           <div>
             <p className="m-0" >{"By Peterborough Nepalese Society"}</p>
             <time>{article.date}</time>
@@ -48,7 +48,7 @@ const ArticleScreen = (props) => {
         <Carousel>
           {article.images && article.images.map((image) =>
             <Carousel.Item>
-              <img key={image.id} src={`${process.env.REACT_APP_API}/assets/media/images/articles/${image.image}`} alt={image.title} />
+              <img key={image.id} src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${image.image}`} alt={image.title} />
 
               {/* <Carousel.Caption>
                 <h3>First slide label</h3>

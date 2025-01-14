@@ -9,6 +9,7 @@ const lodash = require('lodash');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
+const http = require('http');
 
 
 const defaultEvents = require('./backup/defaults/events.json');
@@ -793,15 +794,23 @@ app.get('/article-screen/:id', async (req, res) => {
   res.json(data);  
 });
 
-const options = {
-  key: fs.readFileSync(path.join(__dirname, 'server.key')),
-  cert: fs.readFileSync(path.join(__dirname, 'server.cer'))
-};
+if (process.env.NODE_ENV === 'production') {
+  const options = {
+    key: fs.readFileSync(path.join(__dirname, 'server.key')),
+    cert: fs.readFileSync(path.join(__dirname, 'server.cert'))
+  };
 
-// Create HTTPS server
-https.createServer(options, app).listen(port, () => {
-  console.log(`Server is running on https://localhost:${port}`);
-});
+  // Create HTTPS server
+  https.createServer(options, app).listen(port, () => {
+    console.log(`Server is running on https://localhost:${port}`);
+  });
+} else {
+  // Create HTTP server
+  http.createServer(app).listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}
+
 
 // // Start the server
 // app.listen(port, () => {

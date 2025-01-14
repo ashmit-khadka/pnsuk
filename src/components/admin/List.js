@@ -68,7 +68,7 @@ const List = () => {
           <td>{member.name}</td>
           <td>
             {member.image}
-            <img src={`${process.env.REACT_APP_API}/assets/media/committee/${member.image}`} alt={member.name} className="w-10 h-10" />
+            <img src={`${process.env.REACT_APP_HOST}/assets/media/committee/${member.image}`} alt={member.name} className="w-10 h-10" />
           </td>
           <td>{member.position}</td>
           <td>{member.order}</td>
@@ -91,7 +91,7 @@ const List = () => {
           <td>{article.title}</td>
           <td>
             {article.image}
-            <img src={`${process.env.REACT_APP_API}/assets/media/images/articles/${article.image}`} alt={article.title} className="w-10 h-10" />
+            <img src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${article.image}`} alt={article.title} className="w-10 h-10" />
           </td>
           <td>{article.date}</td>
           <td>

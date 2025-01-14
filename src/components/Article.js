@@ -19,7 +19,7 @@ const Article = (props) => {
   return (
     <div className="w-full flex flex-col cursor-pointer group font-raleway" onClick={onArticleClick}>
       <div className="overflow-hidden">
-        <img className="w-full w-full h-48 rounded-lg mb-2 object-cover transform transition-transform duration-300 group-hover:scale-110" src={`${process.env.REACT_APP_API}/assets/media/images/articles/${images[0]?.image}`} alt="placeholder" />
+        <img className="w-full w-full h-48 rounded-lg mb-2 object-cover transform transition-transform duration-300 group-hover:scale-110" src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${images[0]?.image}`} alt="placeholder" />
       </div>
       <h3 className="text-lg font-bold m-0 group-hover:underline">{title}</h3>
       <time dateTime={date}>{moment(date).fromNow()}</time>

@@ -77,7 +77,7 @@ const HomeScreen = () => {
           <Carousel>
             {data?.images?.map((article) => 
               <Carousel.Item className="w-full h-96 rounded-lg" key={article.id}>
-                <img className="w-full object-contain rounded-lg" key={article.id} src={`${process.env.REACT_APP_API}/assets/media/images/articles/${article.images[0].image}`} alt={article.title} />
+                <img className="w-full object-contain rounded-lg" key={article.id} src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${article.images[0].image}`} alt={article.title} />
               </Carousel.Item>
             )  
           }
