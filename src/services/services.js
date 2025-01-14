@@ -174,7 +174,7 @@ const submitArticle = async (data, images) => {
 
 
   const fetch = axios.create({
-    baseURL: process.env.REACT_APP_HOST, // Set your base URL here
+    baseURL: process.env.REACT_APP_API, // Set your base URL here
     headers: {
       'Content-Type': 'application/json',
     },
