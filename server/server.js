@@ -802,7 +802,7 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   const options = {
     key: fs.readFileSync(path.join(__dirname, 'server.key')),
-    cert: fs.readFileSync(path.join(__dirname, 'server.cert'))
+    cert: fs.readFileSync(path.join(__dirname, 'server.cer'))
   };
 
   // Create HTTPS server
