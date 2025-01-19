@@ -17,8 +17,9 @@ import AboutScreen from './components/screens/AboutScreen';
 import MinutesScreen from './components/screens/MinutesScreen';
 import EventsScreen from './components/screens/EventsScreen';
 import Footer from './components/Footer';
+import ProtectedRoute from './ProtectedRoute';
 
-function App() {
+function App() {  
   return (
     <div className='flex flex-col items-center pt-24'>
       <Navigation />
@@ -29,15 +30,17 @@ function App() {
           <Route path="committee" element={<CommitteeScreen />} />
           <Route path="article/:id" element={<ArticleScreen />} />
           <Route path="admin" element={<Login />} />
-          <Route path="admin/dashboard" element={<List />} />
-          <Route path="admin/article" element={<ArticleForm />} />
-          <Route path="admin/member" element={<MemberForm />} />
-          <Route path="admin/minute" element={<MinuteForm />} />
-          <Route path="about" element={<AboutScreen />} />
-          <Route path="admin/event" element={<EventForm />} />#
-          <Route path="minutes" element={<MinutesScreen />} />
-          <Route path="events" element={<EventsScreen />} />
-
+              <Route element={<ProtectedRoute />} >        
+                <Route path="admin/dashboard" element={<List />} />
+                <Route path="admin/article" element={<ArticleForm />} />
+                <Route path="admin/member" element={<MemberForm />} />
+                <Route path="admin/minute" element={<MinuteForm />} />
+                <Route path="about" element={<AboutScreen />} />
+                <Route path="admin/event" element={<EventForm />} />
+                <Route path="minutes" element={<MinutesScreen />} />
+                <Route path="events" element={<EventsScreen />} />
+              </Route>
+          
           {/* <Route element={<AuthLayout />}>
     <Route path="login" element={<Login />} />
     <Route path="register" element={<Register />} />
