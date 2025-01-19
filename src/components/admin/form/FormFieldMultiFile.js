@@ -42,7 +42,7 @@ const FormFieldMultiFile = (props) => {
         >
           <img
             className="w-48 h-48 rounded-lg object-cover"
-            src={`http://localhost:3000/assets/media/article/${image.image}`}
+            src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${image.image}`}
             alt={image.image}
           />
           <div className="flex flex-col">

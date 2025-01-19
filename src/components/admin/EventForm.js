@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useLocation } from 'react-router';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { getMember } from "../../services/services";
 import FormFieldTextbox from "./form/FormFieldTextbox";
 import FormFieldDate from "./form/FormFieldDate";
@@ -97,7 +97,7 @@ const EventForm = (props) => {
         reset(data);
         setSelectedImage({
           name: data.image,
-          preview: `http://localhost:3000/assets/images/${data.image}`
+          preview: `${process.env.REACT_APP_HOST}/assets/images/${data.image}`
         })
         setMode(FORM_MODE.UPDATE);
       });

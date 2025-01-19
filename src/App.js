@@ -13,13 +13,16 @@ import ArticleForm from './components/admin/ArticleForm';
 import MemberForm from './components/admin/MembersForm';
 import MinuteForm from './components/admin/MinutesForm';
 import EventForm from './components/admin/EventForm';
-
+import AboutScreen from './components/screens/AboutScreen';
+import MinutesScreen from './components/screens/MinutesScreen';
+import EventsScreen from './components/screens/EventsScreen';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <div className='flex flex-col items-center pt-24'>
       <Navigation />
-      <div className='max-w-screen-xl margin-auto'>
+      <div className='max-w-page margin-auto px-4 md:px-0'>
         <Routes>
           <Route index element={<HomeScreen />} />
           <Route path="articles" element={<ArticlesScreen />} />
@@ -30,7 +33,10 @@ function App() {
           <Route path="admin/article" element={<ArticleForm />} />
           <Route path="admin/member" element={<MemberForm />} />
           <Route path="admin/minute" element={<MinuteForm />} />
-          <Route path="admin/event" element={<EventForm />} />
+          <Route path="about" element={<AboutScreen />} />
+          <Route path="admin/event" element={<EventForm />} />#
+          <Route path="minutes" element={<MinutesScreen />} />
+          <Route path="events" element={<EventsScreen />} />
 
           {/* <Route element={<AuthLayout />}>
     <Route path="login" element={<Login />} />
@@ -46,6 +52,7 @@ function App() {
 
 
       </div>
+      <Footer />
     </div>
   );
 }

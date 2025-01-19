@@ -1,0 +1,29 @@
+[
+  {
+    "id": "f4ff1103-1f8a-4954-bf8c-c12823117815",
+    "title": "PNS Tea / Coffee Morning",
+    "description": "PNS has organised tea coffee session every Saturday morning for local community at Stafford Hall, Westwood",
+    "timestamp": "2024-12-29T09:00:00Z",
+    "location": "Stafford Hall, Westwood",
+    "contact": "07958452503, 07309108000",
+    "recurring": "weekly"
+  },
+  {
+    "id": "8b6b80e1-23a5-40b5-af62-6062aaaea9df",
+    "title": "Bijaya dashami celebration 2081",
+    "description": "Dashain is the main festival of Nepalese which is called Vijaya Dashami! It is celebrated as the end of Durga Puja. The day of victory is celebrated as Vijayadashami, symbolizing Rama's victory over the 10-headed demon king Ravana, an avatar of Vishnu, who kidnapped Rama's wife Sita. Dashain is the main exchange of greetings of Nepali people along with many local artistes and there will be a unique performance by famous Nepali folk national singer Kala Lamsal, Nepali folk national singer Robin Lamichhane and famous model/actress Rubina Adhikari",
+    "timestamp": "2024-10-07T00:00:00Z",
+    "location": "2020 world buffet, 35 new rsd, peterborough PE1 1Fj",
+    "contact": "PNS",
+    "recurring": "monthly"
+  },
+  {
+    "id": "530fc98b-3da4-4d06-a7a7-b57104203578",
+    "title": "Meditation Program",
+    "description": "The Peterborough Nepali Society, on its own initiative, Oshodhara, Gurudev Osho Akhand of Nepal will explain the importance of meditation in today's era and teach the methods and methods of meditation. PNS is going to organize this one-day camp thinking that it will be beneficial for the members of the society to learn the methods and methods of meditation directly from a specific personality.",
+    "timestamp": "2024-10-06T00:00:00Z",
+    "location": "St. Jude's peterborough PE3 &EW",
+    "contact": "PNS",
+    "recurring": "none"
+  }
+]

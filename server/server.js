@@ -6,11 +6,30 @@ const app = express();
 const port = 3001;
 const multer = require("multer");
 const lodash = require('lodash');
+const path = require('path');
+const fs = require('fs');
+const https = require('https');
+const http = require('http');
+
+
+const defaultEvents = require('./backup/defaults/events.json');
 
 // Set up storage with Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'public/assets/images/'); // Set upload folder
+    let path
+    switch (req?.body?.type) {
+      case 'article':
+        path = 'public/assets/media/images/articles/';
+        break;
+      case 'committee':
+        path = 'public/assets/media/images/committee/';
+        break;
+      case 'image':
+        path = 'public/assets/media/member_imgs/';
+        break;
+    }
+    cb(null, path); // Set upload folder
   },
   filename: (req, file, cb) => {
     // file name should be unique, use uuidv4 and use original file extension
@@ -24,8 +43,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+const dbPath = path.join(__dirname, 'db.sqlite3');
+const dbPathBackup = path.join(__dirname, 'backup/db.sqlite3');
+
+
 // Connect to the database
-const db = new sqlite3.Database('C:/Users/ashmi/Documents/Projects/pnsuk/server/db.sqlite3', (err) => {
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error(err.message);
     return;
@@ -34,7 +57,7 @@ const db = new sqlite3.Database('C:/Users/ashmi/Documents/Projects/pnsuk/server/
 });
 
 // Connect to old the database (for migration only)
-const db_old = new sqlite3.Database('C:/Users/ashmi/Documents/Projects/pnsuk/server/backup/db_old.sqlite3', (err) => {
+const db_old = new sqlite3.Database(dbPathBackup, (err) => {
   if (err) {
     console.error(err.message);
     return;
@@ -69,7 +92,7 @@ const dbRunAsync = (sql, db, params = []) => {
 const getArticles = async () => {
   // Get all articles from the database
   const articles = await new Promise((resolve, reject) => {
-    db.all('SELECT * FROM articles;', (err, rows) => {
+    db.all('SELECT * FROM articles ORDER BY DATE DESC;', (err, rows) => {
       if (err) {
         return reject(err);
       }
@@ -102,64 +125,29 @@ const getArticleById = async (id) => {
   return article;
 };
 
-app.get('/articles', async (req, res) => {
-  try {
-    const articles = await getArticles();
-    res.json(articles);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send(err.message);
-  }
-});
 
-app.get('/article/:id', async (req, res) => {
-  // Get article from the database with images
-  const article = await getArticleById(req.params.id);
-  res.json(article);
-});
 
-app.post('/article', upload.array("images", 10), (req, res) => {
-  const article = req.body;
-  const articleId = uuidv4();
-  const imageId = uuidv4();
+// app.post('/article', upload.array("images", 10), (req, res) => {
+//   const article = req.body;
+//   const articleId = uuidv4();
+//   const imageId = uuidv4();
 
-  // db.serialize(() => {
-  //   db.run('INSERT INTO articles (id, title, date, text, is_event, is_aid, is_guest, is_project, is_home, is_sport) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);', [articleId, article.title, article.date, article.text, article.is_event, article.is_aid, article.is_guest, article.is_project, article.is_home, article.is_sport]);
-  //   db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, articleId, article.image]);
-  // });
+//   // db.serialize(() => {
+//   //   db.run('INSERT INTO articles (id, title, date, text, is_event, is_aid, is_guest, is_project, is_home, is_sport) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);', [articleId, article.title, article.date, article.text, article.is_event, article.is_aid, article.is_guest, article.is_project, article.is_home, article.is_sport]);
+//   //   db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, articleId, article.image]);
+//   // });
 
-  res.status(201).send('Article created');
-});
+//   res.status(201).send('Article created');
+// });
 
 // Endpoint to handle multiple files and text data upload
-app.post("/upload", upload.array("images", 10), (req, res) => {
 
-  if (!req.files) {
-    return res.status(400).send("No files were uploaded.");
-  }
+const convertToBoolean = (value) => {
+  return value === 'true' ? 1 : 0;
+}
 
-  const newArticle = {
-    id: req.body.id,
-    title: req.body.title,
-    text: req.body.text,
-    date: req.body.date,
-    is_event: req.body.is_event,
-    is_aid: req.body.is_aid,
-    is_guest: req.body.is_guest,
-    is_project: req.body.is_project,
-    is_home: req.body.is_home,
-    is_sport: req.body.is_sport,
-    images: { new: req.files, old: req.body.existing_images },
-  };
 
-  if (newArticle?.id) {
-    updateArticle(newArticle);
-  } else {
-    creatArticle(newArticle);
-  }
-});
-
-const creatArticle = (article) => {
+const creatArticle = async (article) => {
   const articleId = uuidv4();
 
   db.serialize(() => {
@@ -170,9 +158,11 @@ const creatArticle = (article) => {
       db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, articleId, image.filename]);
     });
   });
+
+  return articleId;
 };
 
-const updateArticle = (article) => {
+const updateArticle = async (article) => {
   db.serialize(() => {
     db.run('UPDATE articles SET title = ?, date = ?, text = ?, is_event = ?, is_aid = ?, is_guest = ?, is_project = ?, is_home = ?, is_sport = ? WHERE id = ?;', [article.title, article.date, article.text, article.is_event, article.is_aid, article.is_guest, article.is_project, article.is_home, article.is_sport, article.id]);
   });
@@ -190,6 +180,8 @@ const updateArticle = (article) => {
       db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, article.id, image]);
     });
   });
+
+  return article.id;  
 };
 
 const deleteArticleImages = (imageId) => {
@@ -197,6 +189,55 @@ const deleteArticleImages = (imageId) => {
     db.run('DELETE FROM article_images WHERE image = ?;', [imageId]);
   });
 }
+
+app.get('/articles', async (req, res) => {
+  try {
+    const articles = await getArticles();
+    res.json(articles);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/article/:id', async (req, res) => {
+  // Get article from the database with images
+  const article = await getArticleById(req.params.id);
+  res.json(article);
+});
+
+app.post("/article", upload.array("images", 10), async (req, res) => {
+
+  if (!req.files) {
+    return res.status(400).send("No files were uploaded.");
+  }
+
+  const newArticle = {
+    id: req.body.id,
+    title: req.body.title,
+    text: req.body.text,
+    date: req.body.date,
+    is_event: convertToBoolean(req.body.is_event),
+    is_aid: convertToBoolean(req.body.is_aid),
+    is_guest: convertToBoolean(req.body.is_guest),
+    is_project: convertToBoolean(req.body.is_project),
+    is_home: convertToBoolean(req.body.is_home),
+    is_sport: convertToBoolean(req.body.is_sport),
+    images: { new: req.files, old: req.body.existing_images },
+  };
+
+  let articleId = newArticle?.id
+  if (articleId) {
+    articleId = await updateArticle(newArticle);
+  } else {
+    articleId = await creatArticle(newArticle);
+  }
+
+  const article = await getArticleById(articleId);
+
+  res.json(article);
+});
+
 
 app.delete('/article/image/:id', (req, res) => {
   deleteArticleImages(req.params.id);
@@ -638,7 +679,7 @@ app.get('/migrate', async (req, res) => {
   await dbRunAsync('CREATE TABLE article_images (id TEXT PRIMARY KEY, article TEXT, image TEXT);', db);
   await dbRunAsync('CREATE TABLE members (id TEXT PRIMARY KEY, name TEXT, image TEXT, role TEXT, position TEXT, "order" INTEGER);', db);
   await dbRunAsync('CREATE TABLE minutes (id TEXT PRIMARY KEY, "title" TEXT, file TEXT, description TEXT, date TEXT);', db);
-  await dbRunAsync('CREATE TABLE events (id TEXT PRIMARY KEY, title TEXT, description TEXT, date TEXT, "location" TEXT, "contact" TEXT);', db);
+  await dbRunAsync('CREATE TABLE events (id TEXT PRIMARY KEY, title TEXT, description TEXT, timestamp TEXT, "location" TEXT, "contact" TEXT, recurring TEXT);', db);
   await dbRunAsync('CREATE TABLE login (id TEXT PRIMARY KEY, username TEXT, password TEXT);', db);
 
   articles.forEach(async article => {
@@ -662,9 +703,10 @@ app.get('/migrate', async (req, res) => {
     await dbRunAsync('INSERT INTO members (id, name, image, role, position, "order") VALUES (?, ?, ?, ?, ?, ?);', db, [memberId, member.name, formatedImage, role, member.position, member.order]);
   });
 
-  events.forEach(async event => {
+
+  defaultEvents.forEach(async event => {
     const eventId = uuidv4();
-    await dbRunAsync('INSERT INTO events (id, title, description, date, "location", "contact") VALUES (?, ?, ?, ?, ?, ?);', db, [eventId, event.title, event.description, event.date, event.location, event.contact]);
+    await dbRunAsync('INSERT INTO events (id, title, description, timestamp, "location", "contact", recurring) VALUES (?, ?, ?, ?, ?, ?, ?);', db, [eventId, event.title, event.description, event.timestamp, event.location, event.contact, event.recurring]);
   });
 
   minutes.forEach(async minute => {
@@ -717,15 +759,15 @@ app.get('/home', async (req, res) => {
       ORDER BY date DESC
       LIMIT 4;
     `, db);
-    
+  const images = await dbAllAsync('SELECT * FROM articles WHERE is_home = 1;', db);
   const memeberPresident = await dbAllAsync('SELECT * FROM members WHERE position = "President and Trustee" LIMIT 1;', db);
   const memberVicePresident = await dbAllAsync('SELECT * FROM members WHERE position = "Vice President" LIMIT 2;', db);
   const memberCoordinator = await dbAllAsync('SELECT * FROM members WHERE position = "Coordinator" LIMIT 1;', db);
+  const events = await dbAllAsync('SELECT * FROM events ORDER BY timestamp DESC LIMIT 3;', db);
 
-
-  const events = await dbAllAsync('SELECT * FROM events ORDER BY date DESC LIMIT 3;', db);
 
   const data = {
+    images: await mapImagesToArticles(images),
     donations: await mapImagesToArticles(donations),
     articles: await mapImagesToArticles(articles),
     members: {
@@ -752,9 +794,25 @@ app.get('/article-screen/:id', async (req, res) => {
   res.json(data);  
 });
 
+if (process.env.NODE_ENV === 'development') {
+  // Create HTTP server
+  http.createServer(app).listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+} else {
+  const options = {
+    key: fs.readFileSync(path.join(__dirname, 'server.key')),
+    cert: fs.readFileSync(path.join(__dirname, 'server.cer'))
+  };
+
+  // Create HTTPS server
+  https.createServer(options, app).listen(port, () => {
+    console.log(`Server is running on https://localhost:${port}`);
+  });
+}
 
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+// // Start the server
+// app.listen(port, () => {
+//   console.log(`Server is running on http://localhost:${port}`);
+// });
