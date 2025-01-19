@@ -3,9 +3,9 @@ import { Outlet, Navigate } from 'react-router-dom';
 import { LoginContext } from './components/admin/Login';
 
 const ProtectedRoutes = () => {
-    const { setLoginData } = useContext(LoginContext);
+    const { loginState } = useContext(LoginContext);
 
-    return setLoginData ? <Outlet /> : <Navigate to="/"/> // Redirect to login if not authenticated
+    return loginState ? <Outlet /> : <Navigate to="/"/> // Redirect to login if not authenticated
 }
 
 export default ProtectedRoutes;
