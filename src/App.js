@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import HomeScreen from './components/screens/HomeScreen';
@@ -5,6 +6,7 @@ import ArticlesScreen from './components/screens/ArticlesScreen';
 import CommitteeScreen from './components/screens/CommitteeScreen';
 import ArticleScreen from './components/screens/ArticleScreen';
 import { Routes, Route } from "react-router";
+import { LoginContext } from './components/admin/Login';
 import Navigation from './components/Navigation';
 
 import Login from './components/admin/Login';
@@ -20,7 +22,11 @@ import Footer from './components/Footer';
 import ProtectedRoute from './ProtectedRoute';
 
 function App() {  
+  const [loginState, setLoginState] = useState(false);
+
+
   return (
+    <LoginContext.Provider value={{ loginState, setLoginState }}>
     <div className='flex flex-col items-center pt-24'>
       <Navigation />
       <div className='max-w-page margin-auto px-4 md:px-0'>
@@ -57,6 +63,7 @@ function App() {
       </div>
       <Footer />
     </div>
+    </LoginContext.Provider>
   );
 }
 

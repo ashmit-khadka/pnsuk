@@ -3,7 +3,7 @@ import React, { useState, createContext } from "react";
 import { useNavigate } from "react-router";
 
 
-export const LoginContext = createContext(false);
+export const LoginContext = createContext();
 
 const Login = () => {
 
