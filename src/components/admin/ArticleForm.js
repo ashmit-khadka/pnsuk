@@ -11,7 +11,6 @@ import { Button } from "react-bootstrap";
 
 
 const ArticleForm = (props) => {
-  const { selectedArticle } = props;
   const { state } = useLocation();
   const [mode, setMode] = useState(formModeEnum.CREATE);
 
@@ -33,37 +32,32 @@ const ArticleForm = (props) => {
 
   const [selectedImages, setSelectedImages] = useState([]);
 
+  const resetForm = (article) => {
+    reset({
+      id: article.id,
+      title: article.title,
+      text: article.text,
+      date: article.date,
+      is_event: article.is_event,
+      is_aid: article.is_aid,
+      is_guest: article.is_guest,
+      is_project: article.is_project,
+      is_home: article.is_home,
+      is_sport: article.is_sport,
+    });
+    setSelectedImages(article.images);
+  }
+
   // submit form
   const onSubmit = async (data) => {
-    const response = await submitArticle(state.id, data, selectedImages, mode);
-    reset();
-    setSelectedImages([]);
+    const response = await submitArticle(data, selectedImages);
+    resetForm(response);
   } 
-
-
-  useEffect(() => {
-    if (selectedArticle) {
-      reset({
-        id: selectedArticle.id,
-        title: selectedArticle.title,
-        text: selectedArticle.text,
-        date: selectedArticle.date,
-        is_event: selectedArticle.is_event,
-        is_aid: selectedArticle.is_aid,
-        is_guest: selectedArticle.is_guest,
-        is_project: selectedArticle.is_project,
-        is_home: selectedArticle.is_home,
-        is_sport: selectedArticle.is_sport,
-      });
-      setSelectedImages(selectedArticle.images);
-    }
-  }, [selectedArticle]);
 
   useEffect(() => {
     if (state?.id) {
       getArticle(state.id).then((data) => {
-        reset(data);
-        setSelectedImages(data.images);
+        resetForm(data);
         setMode(formModeEnum.UPDATE);
       });
     }

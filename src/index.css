@@ -61,3 +61,25 @@ h1 h2 h3 h4 h5 h6 {
   border-radius: 0; /* Change border-radius to 0 to make it squared */
   transform: scale(1.1); /* Zoom into the image */
 }
+
+
+.home-upcomming-events {
+  position: relative;
+  background-color: #285F9E;
+  overflow: visible;
+}
+
+.home-upcomming-events-scribble {
+  position: absolute;
+  bottom: -700px;
+  left: -60px;
+  fill: #285F9E;
+  z-index: -1;
+  width: 100%;
+}
+
+.home-upcomming-event {
+  background-color: #0A2041;
+  color: white;
+
+}
