@@ -15,7 +15,7 @@ const Login = () => {
 
   const login = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:3001/login", {
+    await axios.post(`${process.env.REACT_APP_API}/login`, {
       username: e.target[0].value,
       password: e.target[1].value
     }).then((response) => {
