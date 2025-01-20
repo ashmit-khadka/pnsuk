@@ -65,7 +65,8 @@ const ArticleForm = (props) => {
 
   return (
     <>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-page mx-auto p-6 bg-themeLight rounded-lg shadow-md">
+      <div className="mb-4">
         <FormFieldTextbox
           id="title"
           label="Title"
@@ -74,17 +75,21 @@ const ArticleForm = (props) => {
           validation={{
             required: "Enter the article title"
           }}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
+      </div>
+      <div className="mb-4">
         <FormFieldTextbox
           id="description"
           label="Description"
           register={register}
           errors={errors}
-          validation={{
-            required: "Enter the article description"
-          }}
+          validation={{}}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
-        <FormFieldDate
+      </div>
+      <div className="mb-4">
+        <FormFieldTextbox
           id="date"
           label="Date"
           register={register}
@@ -92,63 +97,86 @@ const ArticleForm = (props) => {
           validation={{
             required: "Enter the article date"
           }}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
+      </div>
+      <div className="mb-4">
         <FormFieldCheckbox
           id="is_event"
           label="Is Event"
           register={register}
           errors={errors}
           validation={{}}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
+      </div>
+      <div className="mb-4">
         <FormFieldCheckbox
           id="is_aid"
           label="Is Aid"
           register={register}
           errors={errors}
           validation={{}}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
+      </div>
+      <div className="mb-4">
         <FormFieldCheckbox
           id="is_guest"
           label="Is Guest"
           register={register}
           errors={errors}
           validation={{}}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
+      </div>
+      <div className="mb-4">
         <FormFieldCheckbox
           id="is_project"
           label="Is Project"
           register={register}
           errors={errors}
           validation={{}}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
+      </div>
+      <div className="mb-4">
         <FormFieldCheckbox
           id="is_home"
           label="Is Home"
           register={register}
           errors={errors}
           validation={{}}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
+      </div>
+      <div className="mb-4">
         <FormFieldCheckbox
           id="is_sport"
           label="Is Sport"
           register={register}
           errors={errors}
           validation={{}}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
-
-          <label className="font-bold">Images</label>
-          <FormFieldMultiFile
-            id="images"
-            register={register}
-            errors={errors}
-            validation={{}}
-            selectedFiles={selectedImages}
-            setSelectedFiles={setSelectedImages}
-            onDeleteFile={deleteArticleImage}
-          />
-        <Button type="submit">Save</Button>
-
-      </form>
+      </div>
+      <div className="mb-4">
+        <label className="block text-themeDark font-bold mb-2">Images</label>
+        <FormFieldMultiFile
+          id="images"
+          register={register}
+          errors={errors}
+          validation={{}}
+          selectedFiles={selectedImages}
+          setSelectedFiles={setSelectedImages}
+          onDeleteFile={deleteArticleImage}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
+        />
+      </div>
+      <button type="submit" className="bg-themePrimary text-white font-bold py-2 px-4 rounded hover:bg-themeDark">
+        Save
+      </button>
+    </form>
 
     </>
   );

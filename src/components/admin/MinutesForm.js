@@ -57,44 +57,59 @@ const MinutesForm = (props) => {
 
 
   return (
-    <form onSubmit={handleSubmit(onMinuteSubmit)}>
-      <FormFieldTextbox
-        id="title"
-        label="Title"
-        register={register}
-        errors={errors}
-        validation={{
-          required: "Enter the minute title"
-        }}
-      />
-      <FormFieldTextbox
-        id="description"
-        label="Description"
-        register={register}
-        errors={errors}
-        validation={{}}
-      />
-      <FormFieldDate
-        id="date"
-        label="Date"
-        register={register}
-        errors={errors}
-        validation={{
-          required: "Enter the minute date"
-        }}
-      />
-      <FormFieldFile
-        id="document"
-        label="Document"
-        register={register}
-        errors={errors}
-        validation={{
-          //required: "Upload the minute document"
-        }}
-        selectedFile={selectedDocument}
-        setSelectedFile={setSelectedDocument}
-      />
-      <button type="submit">Save</button>
+<form onSubmit={handleSubmit(onMinuteSubmit)} className="max-w-page mx-auto p-6 bg-themeLight rounded-lg shadow-md">
+      <div className="mb-4">
+        <FormFieldTextbox
+          id="title"
+          label="Title"
+          register={register}
+          errors={errors}
+          validation={{
+            required: "Enter the minute title"
+          }}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        <FormFieldTextbox
+          id="description"
+          label="Description"
+          register={register}
+          errors={errors}
+          validation={{}}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        <FormFieldDate
+          id="date"
+          label="Date"
+          register={register}
+          errors={errors}
+          validation={{
+            required: "Enter the minute date"
+          }}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        <FormFieldFile
+          id="document"
+          label="Document"
+          register={register}
+          errors={errors}
+          validation={{
+            //required: "Upload the minute document"
+          }}
+          selectedFile={selectedDocument}
+          setSelectedFile={setSelectedDocument}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
+          labelClassName="text-themeDark font-bold mb-2"
+        />
+      </div>
+      <button type="submit" className="bg-themePrimary text-white font-bold py-2 px-4 rounded hover:bg-themeDark">
+        Save
+      </button>
     </form>
   );
 };

@@ -54,48 +54,63 @@ const MemberForm = (props) => {
   }, [state]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <FormFieldTextbox
-        id="name"
-        label="Name"
-        register={register}
-        errors={errors}
-        validation={{
-          required: "Enter the member name"
-        }}
-      />
-      <FormFieldTextbox
-        id="position"
-        label="Position"
-        register={register}
-        errors={errors}
-        validation={{
-          required: "Enter the member position"
-        }}
-      />
-      <FormFieldTextbox
-        id="order"
-        label="Order"
-        register={register}
-        errors={errors}
-        validation={{
-          required: "Enter the member order"
-        }}
-      />
-      <FormFieldFile
-        id="image"
-        label="Image"
-        register={register}
-        errors={errors}
-        validation={{
-          //required: "Upload the minute document"
-        }}
-        selectedFile={selectedImage}
-        setSelectedFile={setSelectedImage}
-        hasImage={true}
-      />
-      <button type="submit">Save</button>
-    </form>
+<form onSubmit={handleSubmit(onSubmit)} className="max-w-page mx-auto p-6 bg-themeLight rounded-lg shadow-md">
+  <div className="mb-4">
+    <FormFieldTextbox
+      id="name"
+      label="Name"
+      register={register}
+      errors={errors}
+      validation={{
+        required: "Enter the member name"
+      }}
+      className="w-full px-3 py-2 border border-themeDark rounded-md"
+    />
+  </div>
+  <div className="mb-4">
+    <FormFieldTextbox
+      id="position"
+      label="Position"
+      register={register}
+      errors={errors}
+      validation={{
+        required: "Enter the member position"
+      }}
+      className="w-full px-3 py-2 border border-themeDark rounded-md"
+    />
+  </div>
+  <div className="mb-4">
+    <FormFieldTextbox
+      id="order"
+      label="Order"
+      register={register}
+      errors={errors}
+      validation={{
+        required: "Enter the member order"
+      }}
+      className="w-full px-3 py-2 border border-themeDark rounded-md"
+    />
+  </div>
+  <div className="mb-4">
+    <FormFieldFile
+      id="image"
+      label="Image"
+      register={register}
+      errors={errors}
+      validation={{
+        //required: "Upload the minute document"
+      }}
+      selectedFile={selectedImage}
+      setSelectedFile={setSelectedImage}
+      hasImage={true}
+      className="w-full px-3 py-2 border border-themeDark rounded-md"
+      labelClassName="text-themeDark font-bold mb-2"
+    />
+  </div>
+  <button type="submit" className="bg-themePrimary text-white font-bold py-2 px-4 rounded hover:bg-themeDark">
+    Save
+  </button>
+</form>
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const FormFieldFile = (props) => {
-  const { id, label, register, errors, validation, selectedFile, setSelectedFile, hasImage = false } = props;
+  const { id, label, register, errors, validation, selectedFile, setSelectedFile, hasImage = false, labelClassName } = props;
 
   const fileImage = hasImage ? selectedFile?.image : ''
 
@@ -22,7 +22,7 @@ const FormFieldFile = (props) => {
 
   return (
     <div>
-      <label>{label}</label>
+      <label className={labelClassName}>{label}</label>
       <input
         type="file"
         {...register(id, validation)}
