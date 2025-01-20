@@ -107,53 +107,60 @@ const EventForm = (props) => {
   console.log(mode);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label>Title</label>
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-page mx-auto p-6 bg-themeLight rounded-lg shadow-md">
+      <div className="mb-4">
+        <label className="block text-themeDark font-bold mb-2">Title</label>
         <input
           type="text"
           placeholder="Enter Title"
           {...register("title", { required: true })}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
-        {errors.title && <span>Title is required</span>}
+        {errors.title && <span className="text-red-500">Title is required</span>}
       </div>
-      <div>
-        <label>Description</label>
+      <div className="mb-4">
+        <label className="block text-themeDark font-bold mb-2">Description</label>
         <input
           type="text"
           placeholder="Enter Description"
           {...register("description", { required: true })}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
-        {errors.description && <span>Description is required</span>}
+        {errors.description && <span className="text-red-500">Description is required</span>}
       </div>
-      <div>
-        <label>Date</label>
+      <div className="mb-4">
+        <label className="block text-themeDark font-bold mb-2">Date</label>
         <input
           type="text"
           placeholder="Enter Date"
           {...register("date", { required: true })}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
-        {errors.date && <span>Date is required</span>}
+        {errors.date && <span className="text-red-500">Date is required</span>}
       </div>
-      <div>
-        <label>Location</label>
+      <div className="mb-4">
+        <label className="block text-themeDark font-bold mb-2">Location</label>
         <input
           type="text"
           placeholder="Enter Location"
           {...register("location", { required: true })}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
-        {errors.location && <span>Location is required</span>}
+        {errors.location && <span className="text-red-500">Location is required</span>}
       </div>
-      <div>
-        <label>Contact</label>
+      <div className="mb-4">
+        <label className="block text-themeDark font-bold mb-2">Contact</label>
         <input
           type="text"
           placeholder="Enter Contact"
           {...register("contact", { required: true })}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
-        {errors.contact && <span>Contact is required</span>}
+        {errors.contact && <span className="text-red-500">Contact is required</span>}
       </div>
-      <button type="submit">Save</button>
+      <button type="submit" className="bg-themePrimary text-white font-bold py-2 px-4 rounded hover:bg-themeDark">
+        Save
+      </button>
     </form>
   );
 };
