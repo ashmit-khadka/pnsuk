@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import { NavLink } from "react-router";
 
 import Container from 'react-bootstrap/Container';
@@ -7,9 +7,18 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../assets/images/logo.png';
+import LoginContext from "../LoginContext";
 
 
 const Navigation = () => {
+
+  const { loginState, setLoginState } = useContext(LoginContext);
+
+  const logOut = () => {
+    
+    setLoginState(false);
+  };
+
   return (
     // <div>
     //   <nav className="flex navbar">
@@ -30,7 +39,7 @@ const Navigation = () => {
     //   </nav>
     // </div>
 
-    <Navbar expand="lg" className="navigation fixed-top">
+    <Navbar expand="lg" className="w-full navigation fixed-top">
       <Container>
         <Navbar.Brand href="#home">
         <img src={logo} alt="logo" style={{ height: '50px' }} /> {/* Use the image */}
@@ -38,7 +47,7 @@ const Navigation = () => {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="">
+          <Nav className="w-full flex items-center">
             <Nav.Link href="#home">
               <NavLink to="/">Home</NavLink>
             </Nav.Link>
@@ -54,6 +63,10 @@ const Navigation = () => {
             <Nav.Link href="#home">
               <NavLink to="/about">About us</NavLink>
             </Nav.Link>
+            { loginState && (<Nav.Link href="#home">
+                <NavLink className="text-themeDark hover:text-themePrimary" onClick={() => logOut()} to="/Admin">Log Out</NavLink>
+              </Nav.Link>)
+            }
             {/* <Nav.Link href="#home">
               <NavLink to="/committee">Contact us</NavLink>
             </Nav.Link> */}
