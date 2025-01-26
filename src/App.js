@@ -39,14 +39,14 @@ function App() {
             <Route path="events" element={<EventsScreen />} />
             <Route path="about" element={<AboutScreen />} />
 
-            <Route path="admin" element={<Login />} />
+            {/* <Route path="admin" element={<Login />} />
             <Route element={<ProtectedRoute />} >
               <Route path="admin/dashboard" element={<List />} />
               <Route path="admin/article" element={<ArticleForm />} />
               <Route path="admin/member" element={<MemberForm />} />
               <Route path="admin/minute" element={<MinuteForm />} />
               <Route path="admin/event" element={<EventForm />} />
-            </Route>
+            </Route> */}
 
             {/* <Route element={<AuthLayout />}>
     <Route path="login" element={<Login />} />
