@@ -23,7 +23,7 @@ const AboutScreen = () => {
   }
 
   return (
-    <div>
+    <div className="max-w-page margin-auto px-4">
       <Breadcrumbs
         Items={[
           { href: '/', text: 'Home' },

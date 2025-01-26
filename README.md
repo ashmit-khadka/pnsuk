@@ -1,70 +1,103 @@
-# Getting Started with Create React App
+###Repo:
+https://bitbucket.org/a-khadka/pnsuk-react/src/master/
+a0khadka - S6
+ATBBAXcrQ3DyCC4745xBkT9EucaPAA69ACAB
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+##DI
+ashmit.khadka@hotmail.com - Society@07
 
-In the project directory, you can run:
+##DI Droplet
+161.35.165.251
+root - Society@7
 
-### `npm start`
+##IONIS
+627894591 - 627894591
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+#Admin
+https://pnsuk.org:8000/admin
+superuser
+Society@70
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+#Email
+https://mail.ionos.co.uk/
+nepalisociety@pnsuk.org
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+###Development
+##Frontend
+npm install && npm run start
+##Backend
+python -m venv env
+cd env/Scripts
+.\activate
+pip install -r requirements.txt
+python manage.py runserver
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+###Production
+##Frontend
+npm run build
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+##Backend
+gunicorn --bind 0.0.0.0:8000 pnsuk  
+pm2 start "gunicorn --certfile=/www/pnsuk-react/ssl/pnsuk.org_ssl_certificate.cer --keyfile=/www/pnsuk-react/ssl/pnsuk.org_private_key.key --bind 0.0.0.0:8000 pnsuk.wsgi" --name API
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+#Nginx
+server {
+   listen 80 default_server;
+   root /www/pnsuk-react/frontend/build;
+   server_name pnsuk.org;
+   index index.html index.htm;
+   location / {
+     try_files $uri /index.html;
+   }
+}
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#Nginx
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	server_name _;
+	return 301 https://$host$request_uri;
+}
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+server {
+    listen 443;
+    ssl on;
+    ssl_certificate /www/pnsuk-react/ssl/pnsuk.org_ssl_certificate.cer;
+    ssl_certificate_key /www/pnsuk-react/ssl/pnsuk.org_private_key.key;
+    root /www/pnsuk-react/frontend/build;
+    server_name pnsuk.org;
+    index index.html index.htm;
+}
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Email
+nepalisociety
+@Society2007
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+----------------------------------------------------------
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name _;
+        return 301 https://$host$request_uri;
+}
 
-### Analyzing the Bundle Size
+server {
+    listen 443;
+    ssl on;
+    ssl_certificate /signreq.csr;
+    ssl_certificate_key /certificate.pem;
+    root /www/pnsuk-react/frontend/build;
+    server_name pnsuk.org;
+    index index.html index.htm;
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+certificate.pem  key.pem  signreq.csr  www

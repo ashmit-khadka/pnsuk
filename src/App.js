@@ -21,33 +21,34 @@ import EventsScreen from './components/screens/EventsScreen';
 import Footer from './components/Footer';
 import ProtectedRoute from './ProtectedRoute';
 
-function App() {  
+function App() {
   const [loginState, setLoginState] = useState(false);
 
 
   return (
     <LoginContext.Provider value={{ loginState, setLoginState }}>
-    <div className='flex flex-col items-center pt-24'>
-      <Navigation />
-      <div className='max-w-page margin-auto px-4 md:px-0'>
-        <Routes>
-          <Route index element={<HomeScreen />} />
-          <Route path="articles" element={<ArticlesScreen />} />
-          <Route path="committee" element={<CommitteeScreen />} />
-          <Route path="article/:id" element={<ArticleScreen />} />
-          <Route path="admin" element={<Login />} />
-              <Route element={<ProtectedRoute />} >        
-                <Route path="admin/dashboard" element={<List />} />
-                <Route path="admin/article" element={<ArticleForm />} />
-                <Route path="admin/member" element={<MemberForm />} />
-                <Route path="admin/minute" element={<MinuteForm />} />
-                <Route path="about" element={<AboutScreen />} />
-                <Route path="admin/event" element={<EventForm />} />
-                <Route path="minutes" element={<MinutesScreen />} />
-                <Route path="events" element={<EventsScreen />} />
-              </Route>
-          
-          {/* <Route element={<AuthLayout />}>
+      <div className='flex flex-col items-center pt-24'>
+        <Navigation />
+        <div className='w-full flex justify-center md:px-0 px-4'>
+          <Routes>
+            <Route index element={<HomeScreen />} />
+            <Route path="articles" element={<ArticlesScreen />} />
+            <Route path="committee" element={<CommitteeScreen />} />
+            <Route path="article/:id" element={<ArticleScreen />} />
+            <Route path="minutes" element={<MinutesScreen />} />
+            <Route path="events" element={<EventsScreen />} />
+            <Route path="about" element={<AboutScreen />} />
+
+            <Route path="admin" element={<Login />} />
+            <Route element={<ProtectedRoute />} >
+              <Route path="admin/dashboard" element={<List />} />
+              <Route path="admin/article" element={<ArticleForm />} />
+              <Route path="admin/member" element={<MemberForm />} />
+              <Route path="admin/minute" element={<MinuteForm />} />
+              <Route path="admin/event" element={<EventForm />} />
+            </Route>
+
+            {/* <Route element={<AuthLayout />}>
     <Route path="login" element={<Login />} />
     <Route path="register" element={<Register />} />
   </Route>
@@ -57,12 +58,12 @@ function App() {
     <Route path=":city" element={<City />} />
     <Route path="trending" element={<Trending />} />
   </Route> */}
-        </Routes>
+          </Routes>
 
 
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
     </LoginContext.Provider>
   );
 }

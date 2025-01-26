@@ -30,22 +30,32 @@ const Navigation = () => {
     //   </nav>
     // </div>
 
-    <Navbar expand="lg" className="navigation fixed-top">
+    <Navbar expand="lg" className="navigation fixed-top drop-shadow-xl py-3">
       <Container>
-        <Navbar.Brand href="#home">
-        <img src={logo} alt="logo" style={{ height: '50px' }} /> {/* Use the image */}
-
+        <Navbar.Brand href="#home" className="mr-8"
+          style={{ position: 'relative', width: '6rem' }}
+        >
+          <img src={logo} alt="logo" style={{ 
+            height: '6rem',
+            width: '6rem',
+            position: 'absolute',
+            top: '0%',
+            left: '50%',
+            marginLeft: '-5rem',
+            marginTop: '-1.5rem',
+            borderRadius: '15px'
+          }} /> {/* Use the image */}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="">
+        <Navbar.Collapse id="basic-navbar-nav" className="justify-right">
+          <Nav className="flex gap-4">
             <Nav.Link href="#home">
-              <NavLink to="/">Home</NavLink>
+              <NavLink cla to="/">Home</NavLink>
             </Nav.Link>
-            <Nav.Link href="#home">
+            <Nav.Link>
               <NavLink to="/events">Events</NavLink>
             </Nav.Link>
-            <Nav.Link href="#home">
+            <Nav.Link href="">
               <NavLink to="/articles">Articles</NavLink>
             </Nav.Link>
             <Nav.Link href="#home">

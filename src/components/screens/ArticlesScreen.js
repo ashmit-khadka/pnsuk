@@ -6,7 +6,7 @@ import { ReactComponent as IconHeart } from '../../assets/icons/noun-heart.svg';
 import { ReactComponent as IconTrophy } from '../../assets/icons/noun-trophy.svg';
 import { ReactComponent as IconUnderline } from '../../assets/icons/noun-underline.svg';
 import ImageEvents from '../../assets/images/pexels-diohasbi-3280130.jpg'; // Import the JPG image
-import Button from 'react-bootstrap/Button';
+import Button from '../Button';
 import Breadcrumbs from '../Breadcrumbs'
 
 const ArticlesScreen = () => {
@@ -41,10 +41,10 @@ const ArticlesScreen = () => {
       })
   }, []);
 
-  const section = (type, Icon, title, description, numberToDisplay) => (
-    <div className="mt-12 mb-24">
-      <div className="bg-gradient-to-r from-themeDark to-themePrimary text-white p-12 relative mb-12 rounded-lg">
-        <div className="flex gap-4">
+  const section = (type, Icon, title, description, numberToDisplay, image) => (
+    <div className="mb-32 w-full flex flex-col items-center">
+      <div className="bg-gradient-to-r from-themeDark to-themePrimary text-white p-12 mb-12 rounded-lg w-full flex items-center justify-center">
+        <div className="flex gap-4 max-w-page w-full relative">
           <Icon className="w-24 h-24 fill-current text-themeLight" />
           <div className="w-1/2">
             <h2 className="font-bold w-max relative mb-4">
@@ -53,11 +53,11 @@ const ArticlesScreen = () => {
             </h2>
             <p className="m-0">{description}</p>
           </div>
+          <img src={image} alt="Events" className="hidden md:block w-48 h-48 rounded-full absolute right-24 bottom-0 object-cover" />
         </div>
-        <img src={ImageEvents} alt="Events" className="hidden md:block w-48 h-48 rounded-full absolute right-24 bottom-12" /> {/* Use the imported image */}
 
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-page">
         {articles[type].items.slice(0, articles[type].viewAll ? articles.length : numberToDisplay).map(article => (
           <Article
             key={article.id}
@@ -87,37 +87,39 @@ const ArticlesScreen = () => {
   );
 
   return (
-    <div >
-      <Breadcrumbs
-        Items={[
-          { href: '/', text: 'Home' },
-          { href: '/articles', text: 'Articles' }
-        ]}
-      />
-
-      <h1 className="font-lora mb-8 text-center">Articles</h1>
-
-
+    <div className="w-full flex flex-col items-center">
+      <div className="max-w-page w-full flex flex-col">
+        <Breadcrumbs
+          Items={[
+            { href: '/', text: 'Home' },
+            { href: '/articles', text: 'Articles' }
+          ]}
+        />
+        <h1 className="font-lora mb-8">Articles</h1>
+      </div>
       {section(
         'articles',
         IconTeam,
         'Our latest events',
         'Take a look at our latest events and activities that we have hosted. We are proud to share our journey with you.',
         6,
+        `${process.env.REACT_APP_HOST}/assets/media/images/screens/pexels-photo-1274922.jpeg`
       )}
       {section(
         'donations',
         IconHeart,
         'Donations',
         'Donations are a vital part of our work. We are grateful for the support we receive from our community.',
-        3
+        3,
+        `${process.env.REACT_APP_HOST}/assets/media/images/screens/pexels-shihabnymur-712520.jpg`
       )}
       {section(
         'sports',
         IconTrophy,
         'Sports',
         'We are proud to host a range of sports activities for our community. Take a look at our latest sports events.',
-        3
+        3,
+        `${process.env.REACT_APP_HOST}/assets/media/images/screens/pexels-photo-114296.jpeg`
       )}
     </div>
   );

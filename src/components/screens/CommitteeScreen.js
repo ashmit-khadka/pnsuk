@@ -31,12 +31,14 @@ const CommitteeScreen = () => {
   }, []);
 
   const section = (title, description, people) => (
-    <div className="mb-16">
-      <div className="bg-gradient-to-r from-themeDark to-themePrimary text-white p-12 relative mb-12 rounded-lg">
-        <h2>{title}</h2>
-        <p>{description}</p>
+    <div className="w-full mb-16 flex flex-col items-center">
+      <div className="w-full bg-gradient-to-r from-themeDark to-themePrimary text-white p-12 relative mb-12 rounded-lg flex items-center justify-center">
+        <div className="max-w-page">
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="max-w-page w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {people.map(person => (
           <Member
             key={person.id}
@@ -50,15 +52,16 @@ const CommitteeScreen = () => {
   );
 
   return (
-    <div>
-      <Breadcrumbs
-        Items={[
-          { href: '/', text: 'Home' },
-          { href: '/committee', text: 'Committee' }
-        ]}
-      />
-
-      <h1 className="font-lora mb-8 text-center">Committee</h1>
+    <div className="w-full flex flex-col items-center">
+      <div className="max-w-page w-full">
+        <Breadcrumbs
+          Items={[
+            { href: '/', text: 'Home' },
+            { href: '/committee', text: 'Committee' }
+          ]}
+        />
+        <h1 className="font-lora mb-8">Committee</h1>
+      </div>
       {section(
         'Management',
         'The management team is responsible for the day-to-day running of the organisation. They are responsible for the strategic direction of the organisation and ensuring that the organisation meets its objectives.',
