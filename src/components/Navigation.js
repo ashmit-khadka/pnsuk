@@ -7,9 +7,18 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../assets/images/logo.png';
+import LoginContext from "../LoginContext";
 
 
 const Navigation = () => {
+
+  const { loginState, setLoginState } = useContext(LoginContext);
+
+  const logOut = () => {
+    
+    setLoginState(false);
+  };
+
   return (
     // <div>
     //   <nav className="flex navbar">
@@ -30,6 +39,7 @@ const Navigation = () => {
     //   </nav>
     // </div>
 
+
     <Navbar expand="lg" className="navigation fixed-top drop-shadow-xl py-3">
       <Container>
         <Navbar.Brand href="#home" className="mr-8"
@@ -47,6 +57,7 @@ const Navigation = () => {
           }} /> {/* Use the image */}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
         <Navbar.Collapse id="basic-navbar-nav" className="justify-right">
           <Nav className="flex gap-4">
             <Nav.Link href="#home">
@@ -64,6 +75,10 @@ const Navigation = () => {
             <Nav.Link href="#home">
               <NavLink to="/about">About us</NavLink>
             </Nav.Link>
+            { loginState && (<Nav.Link href="#home">
+                <NavLink className="text-themeDark hover:text-themePrimary" onClick={() => logOut()} to="/Admin">Log Out</NavLink>
+              </Nav.Link>)
+            }
             {/* <Nav.Link href="#home">
               <NavLink to="/committee">Contact us</NavLink>
             </Nav.Link> */}
