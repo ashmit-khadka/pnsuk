@@ -5,7 +5,7 @@ import HomeScreen from './components/screens/HomeScreen';
 import ArticlesScreen from './components/screens/ArticlesScreen';
 import CommitteeScreen from './components/screens/CommitteeScreen';
 import ArticleScreen from './components/screens/ArticleScreen';
-import { Routes, Route } from "react-router";
+import { Routes, Route } from "react-router-dom";
 import { LoginContext } from './components/admin/Login';
 import Navigation from './components/Navigation';
 
