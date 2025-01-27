@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import LoginContext from './LoginContext';
 
+
 const ProtectedRoutes = () => {
   const { loginState } = useContext(LoginContext);
 

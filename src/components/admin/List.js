@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getAllArticles, getAllMembers, getAllMinutes, getAllEvents } from "../../services/services";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const List = () => {

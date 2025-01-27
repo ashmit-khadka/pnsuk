@@ -25,7 +25,7 @@ const ArticleScreen = (props) => {
   }, [id]);
 
   return (
-    <div>
+    <div className="w-full max-w-page px-4">
       <Breadcrumbs
         Items={[
           { href: '/', text: 'Home' },

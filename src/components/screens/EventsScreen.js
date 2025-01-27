@@ -6,6 +6,7 @@ import { ReactComponent as IconCalendar } from '../../assets/icons/noun-calendar
 import { ReactComponent as IconPhone } from '../../assets/icons/noun-phone.svg';
 import Event from "../Event";
 import Breadcrumbs from "../Breadcrumbs";
+import { formatDate } from "../../services/formatDate";
 
 const EventsScreen = () => {
   const [events, setEvents] = useState([]);
@@ -92,7 +93,7 @@ const EventsScreen = () => {
   const sortedMonths = Object.keys(groupedEvents).sort((a, b) => moment(b, "MMMM YYYY") - moment(a, "MMMM YYYY"));
 
   return (
-    <div>
+    <div className="max-w-page margin-auto px-4">
       <Breadcrumbs
         Items={[
           { href: '/', text: 'Home' },
@@ -100,7 +101,7 @@ const EventsScreen = () => {
         ]}
       />
 
-      <h1 className="font-lora mb-8 text-center">Events</h1>
+      <h1 className="font-lora mb-8">Events</h1>
       {sortedMonths.map(month => (
         <div className="mt-8" key={month}>
           <h2 className="font-lora mb-4">{month}</h2>
@@ -110,7 +111,7 @@ const EventsScreen = () => {
               title={event.title}
               description={event.description}
               location={event.location}
-              date={event.nextValidDate ? moment(event.nextValidDate).toDate().toString() : "No upcoming date"}
+              date={event.nextValidDate ? event.nextValidDate : "No upcoming date"}
               contact={event.contact}
             />
           ))}

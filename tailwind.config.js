@@ -16,10 +16,10 @@ module.exports = {
         '3': '3 3 0%',
       },
       width: {
-        'page': '80rem',
+        'page': '72rem',
       },
       maxWidth: {
-        'page': '80rem', // Custom max-width value (e.g., 1152px)
+        'page': '72rem', // Custom max-width value (e.g., 1152px)
       },
       fontFamily: {
         hind: ['Hind', 'serif'],
