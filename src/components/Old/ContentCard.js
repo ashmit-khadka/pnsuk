@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router'
 import dateFormat from 'dateformat'
 import { ReactComponent as ImgFacebook } from '../assets/icons/facebook.svg'
 import { ReactComponent as ImgViber } from '../assets/icons/viber.svg'
