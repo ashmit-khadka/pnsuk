@@ -93,7 +93,7 @@ const EventsScreen = () => {
   const sortedMonths = Object.keys(groupedEvents).sort((a, b) => moment(b, "MMMM YYYY") - moment(a, "MMMM YYYY"));
 
   return (
-    <div className="max-w-page margin-auto px-4">
+    <div className="max-w-page margin-auto">
       <Breadcrumbs
         Items={[
           { href: '/', text: 'Home' },

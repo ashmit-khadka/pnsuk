@@ -26,7 +26,7 @@ function App() {
       <LoginProvider>
         <div className='flex flex-col items-center pt-24'>
           <Navigation />
-          <div className='max-w-page margin-auto px-4 md:px-0'>
+          <div className='px-4 md:px-0 w-full flex flex-col items-center'>
             <Routes>
               <Route index element={<HomeScreen />} />
               <Route path="articles" element={<ArticlesScreen />} />
