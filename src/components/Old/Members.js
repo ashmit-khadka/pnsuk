@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import axios from 'axios'
 import { ReactComponent as ImgUser } from '../assets/icons/user.svg'
 import Advertisement from './Advertisement'

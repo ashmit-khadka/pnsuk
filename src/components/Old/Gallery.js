@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import Slider from "react-slick";
 import { ReactComponent as IconArrowLeft } from '../assets/icons/back.svg'
 import { ReactComponent as IconArrowRight } from '../assets/icons/next.svg'

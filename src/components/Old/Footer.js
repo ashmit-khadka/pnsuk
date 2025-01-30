@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import DocGlance from '../assets/docs/PNS_glance.pdf'
 import {ReactComponent as IconLinkedIn} from "../assets/icons/linkedin.svg"
 
