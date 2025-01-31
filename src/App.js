@@ -29,7 +29,7 @@ function App() {
           <div className='px-4 md:px-0 w-full flex flex-col items-center'>
             <Routes>
               <Route index element={<HomeScreen />} />
-              <Route path="articles" element={<ArticlesScreen />} />
+              <Route path="projects" element={<ArticlesScreen />} />
               <Route path="committee" element={<CommitteeScreen />} />
               <Route path="article/:id" element={<ArticleScreen />} />
               <Route path="minutes" element={<MinutesScreen />} />

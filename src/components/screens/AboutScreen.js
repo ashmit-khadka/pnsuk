@@ -27,7 +27,7 @@ const AboutScreen = () => {
       <Breadcrumbs
         Items={[
           { href: '/', text: 'Home' },
-          { href: '/about', text: 'About' }
+          { href: '/about', text: 'About Us' }
         ]}
       />
       <h1 className="font-lora text-5xl text-center pb-16">About Us</h1>

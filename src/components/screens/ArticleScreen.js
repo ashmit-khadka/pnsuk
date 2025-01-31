@@ -29,7 +29,7 @@ const ArticleScreen = (props) => {
       <Breadcrumbs
         Items={[
           { href: '/', text: 'Home' },
-          { href: '/articles', text: 'Articles' },
+          { href: '/projects', text: 'Projects' },
           { text: article.title }
         ]}
       />

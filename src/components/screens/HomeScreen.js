@@ -16,8 +16,11 @@ import Member from "../Member";
 import Carousel from 'react-bootstrap/Carousel';
 import Event from "../Event";
 import Button from '../Button';
+import { useNavigate } from 'react-router';
 
 const HomeScreen = () => {
+
+  const navigate = useNavigate();
 
   const [data, setData] = useState([]);
 
@@ -68,7 +71,7 @@ const HomeScreen = () => {
           <h3 className="font-satisfy text-5xl text-themeDark mb-4">Peterborough Nepalese Society PNS UK</h3>
           <p>The Peterborough Nepalese Society (PNS) is a non-profit making community based organisation established in 2007 with the initiation of all individuals or families originally coming from Nepal and those who are living in and around Peterborough areas.</p>
           <div className="flex flex-col gap-2" >
-            <Button onClick={() => console.log('clicked')}> Learn more</Button>
+            <Button onClick={() => navigate('about')}> Learn more</Button>
             <Button onClick={() => console.log('clicked')}> Book Westwood Hall</Button>
           </div>
           {/* <IconArrow style={{

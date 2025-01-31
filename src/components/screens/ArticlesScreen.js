@@ -92,10 +92,10 @@ const ArticlesScreen = () => {
         <Breadcrumbs
           Items={[
             { href: '/', text: 'Home' },
-            { href: '/articles', text: 'Articles' }
+            { href: '/projects', text: 'Projects' }
           ]}
         />
-        <h1 className="font-lora mb-8">Articles</h1>
+        <h1 className="font-lora mb-8">Projects</h1>
       </div>
       {section(
         'articles',
