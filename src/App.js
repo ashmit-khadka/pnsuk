@@ -19,11 +19,9 @@ import EventsScreen from './components/screens/EventsScreen';
 import Footer from './components/Footer';
 import ProtectedRoute from './ProtectedRoute';
 import { LoginProvider } from './LoginContext';
-import { BrowserRouter } from 'react-router';
 
 function App() {
   return (
-    <BrowserRouter>
       <LoginProvider>
         <div className='flex flex-col items-center pt-24'>
         <ToastContainer />
@@ -62,7 +60,6 @@ function App() {
         </div>
         <Footer />
       </LoginProvider>
-    </BrowserRouter>
   );
 }
 
