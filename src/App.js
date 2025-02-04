@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router';
+import { BrowserRouter as Router, Routes, Route } from 'react-router'
+import { ToastContainer, toast } from 'react-toastify';
 import HomeScreen from './components/screens/HomeScreen';
 import ArticlesScreen from './components/screens/ArticlesScreen';
 import CommitteeScreen from './components/screens/CommitteeScreen';
@@ -25,6 +26,7 @@ function App() {
     <BrowserRouter>
       <LoginProvider>
         <div className='flex flex-col items-center pt-24'>
+        <ToastContainer />
           <Navigation />
           <div className='px-4 md:px-0 w-full flex flex-col items-center'>
             <Routes>
@@ -37,7 +39,7 @@ function App() {
               <Route path="admin" element={<Login />} />
               <Route path="about" element={<AboutScreen />} />
               <Route element={<ProtectedRoute />}>
-                <Route path="admin/dashboard" element={<List />} />
+                <Route path="admin/dashboard/:type" element={<List />} />
                 <Route path="admin/article" element={<ArticleForm />} />
                 <Route path="admin/member" element={<MemberForm />} />
                 <Route path="admin/minute" element={<MinuteForm />} />

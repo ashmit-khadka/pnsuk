@@ -16,3 +16,14 @@ export const formatDate = (date) => {
     return 'Invalid date';
   }
 };
+
+
+export const convertToISOFormat = (dateString) => {
+  // Parse the input date string
+  const date = moment(dateString, 'YYYY-MM-DDTHH:mm');
+
+  // Format the date to the desired ISO format
+  const isoString = date.toISOString();
+
+  return isoString;
+}

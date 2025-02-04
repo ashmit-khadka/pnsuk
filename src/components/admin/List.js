@@ -1,265 +1,195 @@
-import React, { useState, useEffect } from "react";
-import { getAllArticles, getAllMembers, getAllMinutes, getAllEvents } from "../../services/services";
-import { useNavigate } from "react-router";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { getAllArticles, getAllMinutes, getAllEvents, getAllMembers } from '../../services/services';
+import Button from '../Button';
 
-const List = () => {
-  const [members, setMembers] = useState([]);
-  const [articles, setArticles] = useState([]);
-  const [minutes, setMinutes] = useState([]);
-  const [events, setEvents] = useState([]);
+const List = ({ elementType = 'minute' }) => {
 
+  const { type } = useParams();
+
+  const [items, setItems] = useState([]);
+  const [buttonLinks, setButtonLinks] = useState({
+    addButtonText: 'Add New',
+    addButtonLink: "",
+    editButtonLink: "",
+  });
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
-
-  const getMembers = async () => {
-    const members = await getAllMembers();
-    const memberObjects = members.map(member => {
-      return {
-        id: member.id,
-        name: member.name,
-        image: member.image,
-        position: member.position,
-        order: member.order,
-      };
-    });
-    setMembers(memberObjects);
-  }
-
-  const getArticles = async () => {
-    const articles = await getAllArticles();
-    const articleObjects = articles.map(article => {
-      return {
-        id: article.id,
-        title: article.title, 
-        file: article.title,
-        description: article.date,
-        image: article.image,
-        content: article.content,
-        image: article.images[0]?.image || "",
-      };
-    });
-    setArticles(articleObjects);
-  }
-
-  const getMinutes = async () => {
-    const minutes = await getAllMinutes();
-    const minuteObjects = minutes.map(minute => {
-      return {
-        id: minute.id,
-        title: minute.title,
-        description: minute.description,
-        date: minute.date,
-        file: minute.file,
-      };
-    });
-    setMinutes(minuteObjects);
-  }
-
-  const getEventsItems = async () => {
-    const events = await getAllEvents();
-    setEvents(events);
-  }
-
-  const generateMembersTableRows = () => {
-    return members.map((member, index) => {
-      return (
-        <tr key={index}>
-          <td>{member.name}</td>
-          <td>
-            {member.image}
-            <img src={`${process.env.REACT_APP_HOST}/assets/media/committee/${member.image}`} alt={member.name} className="w-10 h-10" />
-          </td>
-          <td>{member.position}</td>
-          <td>{member.order}</td>
-          <td>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-              onClick={() => navigate(`/admin/member/`, { state: { id: member.id } })}   
-            >Edit</button>
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">Delete</button>
-          </td>
-        </tr>
-      );
-    });
-  }
-
-  const generateArticleTableRows = () => {
-    return articles.map((article, index) => {
-      return (
-        <tr key={index}>
-          <td>{article.title}</td>
-          <td>
-            {article.image}
-            <img src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${article.image}`} alt={article.title} className="w-10 h-10" />
-          </td>
-          <td>{article.date}</td>
-          <td>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-              onClick={() => navigate(`/admin/article/`, { state: { id: article.id } })}   
-            >Edit</button>
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">Delete</button>
-          </td>
-        </tr>
-      );
-    });
-  }
-
-  const generateMinutesTableRows = () => {
-    return minutes.map((minute, index) => {
-      return (
-        <tr key={index}>
-          <td>{minute.title}</td>
-          <td>{minute.description}</td>
-          <td>{minute.date}</td>
-          <td>{minute.file}</td>
-          <td>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-              onClick={() => navigate(`/admin/minute/`, { state: { id: minute.id } })}   
-            >Edit</button>
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">Delete</button>
-          </td>
-        </tr>
-      );
-    });
-  }
-
-  const generateEventsTableRows = () => {
-    return events.map((event, index) => {
-      return (
-        <tr key={index}>
-          <td>{event.title}</td>
-          <td>{event.description}</td>
-          <td>{event.date}</td>
-          <td>{event.location}</td>
-          <td>{event.contact}</td>
-          <td>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-              onClick={() => navigate(`/admin/event/`, { state: { id: event.id } })}   
-            >Edit</button>
-            <button onClick={() => onDeleteEvent(event)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">Delete</button>
-          </td>
-        </tr>
-      );
-    });
-  }
-
-  const onDeleteEvent = async (event) => 
-  {
-    try{
-      await axios.delete(`http://localhost:3001/events/${event.id}`);
-    } catch (error){
-      console.error("Error deleting event data:", error);
-    }
-  }
-
   useEffect(() => {
-    getMembers();
-    getArticles();
-    getMinutes();
-    getEventsItems();
-  }, []);
+    const fetchData = async () => {
+      let data = [];
+      let buttonLinks = {}
+      switch (type) {
+        case 'articles':
+          const articles = await getAllArticles();
+          data = articles.map(article => ({
+            data: article, // Store the entire article object in the data property
+            columns: {
+            title: <div className="font-bold">{article.title}</div>, 
+            date: article.date,
+            text: article.text,
+            //image: <img className='w-16 h-16 object-cover rounded-full' src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${article.images[0]?.image || ""}`} alt={article.title} />,
+            },
+            searchFilds: ['title', 'description'],
+          }));  
+          buttonLinks = {
+            addButtonText: 'Add Article',
+            addButtonLink: "/admin/article",
+            editButtonLink: "/admin/article",
+          };
+          break;
+        case 'minutes':
+          const minutes = await getAllMinutes();
+          data = minutes.map(minute => ({
+            data: minute, // Store the entire minute object in the data property
+            columns: {
+              title: <div className="font-bold">{minute.title}</div>,
+              description: minute.description,
+              date: minute.date,
+              file: minute.file,
+            },
+            searchFilds: ['title', 'description', 'date', 'file'],
+          }));
+          buttonLinks = {
+            addButtonText: 'Add Minute',
+            addButtonLink: "/admin/minute",
+            editButtonLink: "/admin/minute",
+          };
+          break;
+        case 'events':
+          const events = await getAllEvents();
+          data = events.map(event => ({
+            data: event, // Store the entire event object in the data property
+            columns: {
+              title: <div className="font-bold">{event.title}</div>,
+              description: event.description,
+              date: event.timestamp,
+              location: event.location,
+              contact: event.contact,
+              recurring: <div className="capitalize">{event.recurring}</div>,
+            },
+            searchFilds: ['title', 'description', 'location', 'contact', 'recurring'],
+          }));
+          buttonLinks = {
+            addButtonText: 'Add Event',
+            addButtonLink: "/admin/event",
+            editButtonLink: "/admin/event",
+          };
+          break;
+        case 'committee':
+          const members = await getAllMembers();
+          data = members.map(member => ({
+            data: member, // Store the entire member object in the data property
+            columns: {
+              name: <div className="font-bold">{member.name}</div>,
+              image: <img 
+                className="w-16 h-16 object-cover rounded-full"
+                src={`${process.env.REACT_APP_HOST}/assets/media/images/committee/${member.image}`} 
+                alt={member.name}
+              />,
+              position: member.position,
+              role: member.role,
+              order: member.order,    
+            },
+            searchFilds: ['name', 'position', 'role'],
+          }));
+          buttonLinks = {
+            addButtonText: 'Add Member',
+            addButtonLink: "/admin/member",
+            editButtonLink: "/admin/member",
+          };
+          break;
+        default:
+          break;
+      }
+      setItems(data);
+      setButtonLinks(buttonLinks);
+    };
 
-  useEffect(() => {
-    getEventsItems();
-  }, [events]);
+    fetchData();
+  }, [type]);
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredItems = items.filter(item => {
+    return Object.values(item.data).some(column => {
+      if (typeof column === 'object') return false;
+      return column.toString().toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  });
+
+  const generateTableHeaders = () => {
+    if (items.length === 0) return null;
+    const keys = Object.keys(items[0].columns).filter(key => key !== 'id');
+    return (
+      <tr>
+        {keys.map((key, index) => (
+          <th key={index} className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+            <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+              {key.charAt(0).toUpperCase() + key.slice(1)}
+            </p>
+          </th>
+        ))}
+        <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+          <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+            Actions
+          </p>
+        </th>
+      </tr>
+    );
+  };
+
+  const generateTableRows = () => {
+    return filteredItems.map((item, index) => {
+      const filteredItem = Object.entries(item.columns).filter(([key]) => key !== 'id');
+      return (
+        <tr key={index} className="even:bg-blue-gray-50/50">
+          {filteredItem.map(([key, value], i) => (
+            <td key={i} className="p-4">
+              <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                {value}
+              </p>
+            </td>
+          ))}
+          <td className="p-4 flex gap-2">
+            <Button
+              onClick={() => navigate(buttonLinks.editButtonLink, { state: { id: item.data.id } })}
+            >
+              Edit
+            </Button>
+            {/* <Button
+              variant='red'
+              onClick={() => deleteMember(item.data.id)}
+            >
+              Delete
+            </Button> */}
+          </td>
+        </tr>
+      );
+    });
+  };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="overflow-x-auto">
-        <div className="flex justify-between items-center mt-4">
-          <h2 className="text-2xl font-semibold mt-4">Articles</h2>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/admin/article/`)}
-          >Add Article</button>
-        </div>
-        <table className="min-w-full bg-white border border-gray-200 mt-4">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Title</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Image</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Date</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {generateArticleTableRows()}
-          </tbody>
-        </table>
-        <div className="flex justify-between items-center mt-4">
-          <h2 className="text-2xl font-semibold mt-4">Members</h2>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/admin/member/`)}
-          >Add Member</button>
-        </div>
-        <table className="min-w-full bg-white border border-gray-200 mt-4">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Name</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Image</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Position</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Order</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {generateMembersTableRows()}
-          </tbody>
-        </table>
-        <div className="flex justify-between items-center mt-4">
-          <h2 className="text-2xl font-semibold mt-4">Minutes</h2>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/admin/minute/`)}
-          >Add Minute</button>
-          </div>
-
-        <table className="min-w-full bg-white border border-gray-200 mt-4">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Title</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Description</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Date</th>
-
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">File</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {generateMinutesTableRows()}
-          </tbody>
-        </table>
-
-        <div className="flex justify-between items-center mt-4">
-          <h2 className="text-2xl font-semibold mt-4">Events</h2>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mt-2"
-            onClick={() => navigate(`/admin/event/`)}
-          >Add Event</button>
-          </div>
-
-
-        <table className="min-w-full bg-white border border-gray-200 mt-4">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Title</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Description</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Date</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Location</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Contact</th>
-              <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-700">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {generateEventsTableRows()}
-          </tbody>
-        </table>
-      </div>
+    <div className="max-w-page w-full">
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchTerm}
+        onChange={handleSearch}
+        className="w-full mb-4 p-2 border border-gray-300"
+      />
+      <Button onClick={() => navigate(buttonLinks.addButtonLink)}>{buttonLinks.addButtonText}</Button>
+      <table className="min-w-full bg-white mt-4">
+        <thead className='mb-4'>
+          {generateTableHeaders()}
+        </thead>
+        <tbody>
+          {generateTableRows()}
+        </tbody>
+      </table>
     </div>
   );
 };

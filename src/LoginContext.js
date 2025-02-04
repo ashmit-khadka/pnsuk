@@ -8,7 +8,7 @@ const defaultLoginState = {
 const LoginContext = createContext(defaultLoginState);
 
 export const LoginProvider = ({ children }) => {
-  const [loginState, setLoginState] = useState(false);
+  const [loginState, setLoginState] = useState(true);
 
   return (
     <LoginContext.Provider value={{ loginState, setLoginState }}>

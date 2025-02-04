@@ -8,6 +8,7 @@ const CommitteeScreen = () => {
 
   const [committee, setCommittee] = useState({
     management: [],
+    advisors: [],
     trustee: [],
     members: [],
     volunteers: [],
@@ -18,11 +19,13 @@ const CommitteeScreen = () => {
     getAllMembers()
       .then((response) => {
         const management = response.filter(member => member.role === 'Management');
+        const advisors = response.filter(member => member.role === 'Advisor');
         const trustee = response.filter(member => member.role === 'Trustee');
         const members = response.filter(member => member.role === 'Member');
         const volunteers = response.filter(member => member.role === 'Volunteer');
         setCommittee({
           management,
+          advisors,
           trustee,
           members,
           volunteers
@@ -66,6 +69,11 @@ const CommitteeScreen = () => {
         'Management',
         'The management team is responsible for the day-to-day running of the organisation. They are responsible for the strategic direction of the organisation and ensuring that the organisation meets its objectives.',
         committee.management,
+      )}
+      {section(
+        'Advisors',
+        'Our advisors are experts in their field and provide valuable advice and guidance to the organisation. They help us to make informed decisions and ensure that we are working towards our goals.',
+        committee.advisors,
       )}
       {section(
         'Trustees',

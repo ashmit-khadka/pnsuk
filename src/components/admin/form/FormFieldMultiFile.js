@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import FormFieldFile from "./FormFieldFile";
-import { Button } from "react-bootstrap";
+import Button from "../../Button";
 
 const FormFieldMultiFile = (props) => {
   const { id, label, register, errors, validation, selectedFiles, setSelectedFiles, onDeleteFile } = props;
-
+  const fileInputRef = useRef(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -24,6 +23,10 @@ const FormFieldMultiFile = (props) => {
     setSelectedFiles(newFiles);
   };
 
+  const handleClick = () => {
+    fileInputRef.current.click();
+  };
+
   return (
     <div>
       <label className="font-bold">{label}</label>
@@ -32,26 +35,30 @@ const FormFieldMultiFile = (props) => {
         type="file"
         {...register(id, validation)}
         onChange={handleImageChange}
+        ref={fileInputRef}
+        style={{ display: 'none' }}
       />
+      <Button type="button" onClick={handleClick}>
+        Add Image +
+      </Button>
       {errors[id] && <span>{errors[id].message}</span>}
 
       {selectedFiles.map((image, index) => (
         <div
           key={index}
-          className="flex gap-4 items-center my-2"
+          className="w-full flex gap-4 items-center my-2"
         >
           <img
             className="w-48 h-48 rounded-lg object-cover"
-            src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${image.image}`}
+            src={image.image ? `${process.env.REACT_APP_HOST}/assets/media/images/articles/${image.image}` : URL.createObjectURL(image)}
             alt={image.image}
           />
-          <div className="flex flex-col">
+          <div className="w-full flex flex-col gap-2">
             <span>{image.name || image.image}</span>
-            <Button variant="danger" type="button" onClick={() => handleDeleteFile(index)}>Delete</Button>
+            <Button variant="red" type="button" onClick={() => handleDeleteFile(index)}>Delete</Button>
           </div>
         </div>
       ))}
-
     </div>
   );
 };

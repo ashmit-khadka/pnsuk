@@ -1,45 +1,46 @@
-import React, { useContext } from "react";
-import { NavLink } from "react-router";
-
+import React, { useState, useContext, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../assets/images/logo.png';
 import LoginContext from "../LoginContext";
 
+const mainLinks = [
+  { path: "/", label: "Home" },
+  { path: "/events", label: "Events" },
+  { path: "/projects", label: "Projects" },
+  { path: "/committee", label: "Committee" },
+  { path: "/about", label: "About us" }
+];
+
+const adminLinks = [
+  { path: "/admin/dashboard/articles", label: "Projects" },
+  { path: "/admin/dashboard/events", label: "Events" },
+  { path: "/admin/dashboard/committee", label: "Committee" },
+  { path: "/admin/dashboard/minutes", label: "Minutes" },
+];
 
 const Navigation = () => {
-
   const { loginState, setLoginState } = useContext(LoginContext);
 
   const logOut = () => {
-    
     setLoginState(false);
   };
 
+  const [navLinks, setNavLinks] = useState([]);
+
+  useEffect(() => {
+    if (loginState) {
+      setNavLinks(adminLinks);
+    } else {
+      setNavLinks(mainLinks);
+    }
+  }, [loginState]);
+
+
   return (
-    // <div>
-    //   <nav className="flex navbar">
-    //     <div className="navbar__logo">
-    //       <img src="/assets/media/logo.png" alt="logo" />
-    //     </div>
-    //     <ul className="flex">
-    //       <li>
-    //         <NavLink to="/">Home</NavLink>
-    //       </li>
-    //       <li>
-    //         <NavLink to="/articles">Articles</NavLink>
-    //       </li>
-    //       <li>
-    //         <NavLink to="/committee">Committee</NavLink>
-    //       </li>
-    //     </ul>
-    //   </nav>
-    // </div>
-
-
     <Navbar expand="lg" className="navigation fixed-top drop-shadow-xl py-3">
       <Container>
         <Navbar.Brand href="#home" className="mr-8"
@@ -54,53 +55,25 @@ const Navigation = () => {
             marginLeft: '-5rem',
             marginTop: '-1.5rem',
             borderRadius: '15px'
-          }} /> {/* Use the image */}
+          }} />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
         <Navbar.Collapse id="basic-navbar-nav" className="justify-right">
           <Nav className="flex gap-4">
-            <Nav.Link href="#home">
-              <NavLink cla to="/">Home</NavLink>
-            </Nav.Link>
-            <Nav.Link>
-              <NavLink to="/events">Events</NavLink>
-            </Nav.Link>
-            <Nav.Link href="">
-              <NavLink to="/projects">Projects</NavLink>
-            </Nav.Link>
-            <Nav.Link href="#home">
-              <NavLink to="/committee">Committee</NavLink>
-            </Nav.Link>
-            <Nav.Link href="#home">
-              <NavLink to="/about">About us</NavLink>
-            </Nav.Link>
-            { loginState && (<Nav.Link href="#home">
-                <NavLink className="text-themeDark hover:text-themePrimary" onClick={() => logOut()} to="/Admin">Log Out</NavLink>
-              </Nav.Link>)
-            }
-            {/* <Nav.Link href="#home">
-              <NavLink to="/committee">Contact us</NavLink>
-            </Nav.Link> */}
-            {/* <Nav.Link href="#home">
-              <NavLink to="/admin">Login</NavLink>
-            </Nav.Link> */}
-            {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
-              </NavDropdown.Item>
-            </NavDropdown> */}
+            {navLinks.map((link, index) => (
+              <Nav.Link key={index} href={link.path}>
+                <NavLink to={link.path}>{link.label}</NavLink>
+              </Nav.Link>
+            ))}
+            {loginState && (
+              <Nav.Link href="#home">
+                <NavLink className="text-themeDark hover:text-themePrimary" onClick={logOut} to="/Admin">Log Out</NavLink>
+              </Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>
-
   );
 }
 

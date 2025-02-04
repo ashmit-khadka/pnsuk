@@ -1,24 +1,26 @@
 import axios from "axios";
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router";
 import LoginContext from './../../LoginContext';
-
+import { useForm } from "react-hook-form";
+import FormFieldTextbox from './form/FormFieldTextbox';
+import Button from "../Button";
 
 const Login = () => {
   const navigate = useNavigate();
   const { setLoginState } = useContext(LoginContext);
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   const [hasLoginFailed, setHasLoginFailed] = useState(false);
 
-  const login = async (e) => {
-    e.preventDefault();
+  const login = async (data) => {
     await axios.post(`${process.env.REACT_APP_API}/login`, {
-      username: e.target[0].value,
-      password: e.target[1].value
+      username: data.username,
+      password: data.password
     }).then((response) => {
       if (response.status === 200) {
         setLoginState(true);
-        navigate("/admin/dashboard");
+        navigate("/admin/dashboard/articles");
       }
     }).catch((error) => {
       if (error.response && error.response.status === 401) {
@@ -32,16 +34,24 @@ const Login = () => {
       <h1>PNSUK</h1>
       <h2>Admin Login</h2>
       {hasLoginFailed && <p>Invalid username or password</p>}
-      <form onSubmit={login}>
-        <div>
-          <label>Username</label>
-          <input type="text" />
-        </div>
-        <div>
-          <label>Password</label>
-          <input type="password" />
-        </div>
-        <button type="submit">Login</button>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(login)}>
+        <FormFieldTextbox
+          id="username"
+          label="Username"
+          placeholder="Enter your username"
+          register={register}
+          errors={errors}
+          validation={{ required: "Username is required" }}
+        />
+        <FormFieldTextbox
+          id="password"
+          label="Password"
+          placeholder="Enter your password"
+          register={register}
+          errors={errors}
+          validation={{ required: "Password is required" }}
+        />
+        <Button type="submit">Login</Button>
       </form>
     </div>
   );

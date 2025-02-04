@@ -32,6 +32,14 @@ const Button = ({
         backgroundColor: '#F56565' // Lighter shade of primary color
       }
     },
+    red: {
+      backgroundColor: '#F56565',
+      color: 'white',
+      transition: 'background-color 0.2s ease',
+      ':hover': {
+        backgroundColor: '#410A0B' // Darker shade of primary color
+      }
+    },
     darkRed: {
       backgroundColor: '#410A0B',
       color: 'white',

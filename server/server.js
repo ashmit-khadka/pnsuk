@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const dbPath = path.join(__dirname, 'db.sqlite3');
-const dbPathBackup = path.join(__dirname, 'backup/db.sqlite3');
+const dbPathBackup = path.join(__dirname, 'backup/db_old.sqlite3');
 
 
 // Connect to the database
@@ -311,15 +311,18 @@ const creatMember = (member) => {
   const memberId = uuidv4();
 
   db.serialize(() => {
-    db.run('INSERT INTO members (id, name, image, position, "order") VALUES (?, ?, ?, ?, ?);', [memberId, member.name, member.image, member.position, member.order]);
+    db.run('INSERT INTO members (id, name, image, position, role, "order") VALUES (?, ?, ?, ?, ?, ?);', [memberId, member.name, member.image, member.position, member.role, member.order]);
   });
+
+  return memberId;
 };
 
 const updateMember = async (member) => {
-  return await db_exec({
-    reqestSQL: `UPDATE members SET name = '${member.name}', image = '${member.image}', position = '${member.position}', "order" = ${member.order} WHERE id = '${member.id}';`,
+  await db_exec({
+    reqestSQL: `UPDATE members SET name = '${member.name}', image = '${member.image}', position = '${member.position}', role = '${member.role}', "order" = ${member.order} WHERE id = '${member.id}';`,
     returnSQL: `SELECT * FROM members WHERE id = '${member.id}';`,
   });
+  return member.id;
 };
 
 
@@ -346,36 +349,35 @@ const getMembers = async () => {
 }
 
 app.get('/members', (req, res) => {
-  // Get all members from the database
-  db.all('SELECT * FROM members;', (err, rows) => {
-    if (err) {
+  getMembers()
+    .then(members => {
+      res.json(members);
+    })
+    .catch(err => {
       console.error(err.message);
       res.status(500).send(err.message);
-      return;
-    }
-    res.json(rows);
-  });
+    });
 });
 
-app.post("/member", upload.single("image"), (req, res) => {
-  const {
-    name,
-    position,
-    order,
-  } = req.body;
-
-  const image = req.file
-
+app.post("/member", upload.single("image"), async (req, res) => {
   const member = {
-    name,
-    image: image?.filename || '',
-    position,
-    order,
+    id: req.body?.id,
+    name: req.body?.name,
+    image: req?.files?.filename || req?.body?.existing_image,
+    position: req.body?.position,
+    role: req.body?.role,
+    order: req.body?.order,
   };
 
-  creatMember(member);
+  if (member?.id) {
+    await updateMember(member);
+  } else {
+    const newMemberId = await creatMember(member);
+    member.id = newMemberId;
+  }
 
-  res.status(201).send('Member created');
+  const memberResponse = await getMember(member?.id);
+  res.json(memberResponse);
 });
 
 app.put("/member/:id", upload.single("image"), async (req, res) => {
@@ -393,9 +395,8 @@ app.put("/member/:id", upload.single("image"), async (req, res) => {
 });
 
 
-app.delete('/member/:id', (req, res) => {
-  deleteMember(req.params.id);
-
+app.delete('/member/:id', async (req, res) => {
+  await deleteMember(req.params.id);
   res.status(200).send('Member deleted');
 });
 
@@ -546,12 +547,25 @@ const getEvents = async () => {
   return events;
 }
 
+const getEvent = async (id) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM events WHERE id = ?;', [id], (err, row) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(row);
+    });
+  });
+}
+
 const createEvent = async (event) => {
   const eventId = uuidv4();
 
   db.serialize(() => {
-    db.run('INSERT INTO events (id, title, description, date, location, contact) VALUES (?, ?, ?, ?, ?, ?);', [eventId, event.title, event.description, event.date, event.location, event.contact]);
+    db.run('INSERT INTO events (id, title, description, timestamp, location, contact, recurring) VALUES (?, ?, ?, ?, ?, ?, ?);', [eventId, event.title, event.description, event.date, event.location, event.contact, event.recurring]);
   });
+
+  return eventId;
 };
 
 const deleteEvent = async (id) => {
@@ -562,9 +576,21 @@ const deleteEvent = async (id) => {
 
 const updateEvent = async (event) => {
   db.serialize(() => {
-    db.run('UPDATE events SET title = ?, description = ?, date = ?, location = ?, contact = ? WHERE id = ?;', [event.title, event.description, event.date, event.location, event.contact, event.id]);
+    db.run('UPDATE events SET title = ?, description = ?, timestamp = ?, location = ?, contact = ?, recurring = ? WHERE id = ?;', [event.title, event.description, event.timestamp, event.location, event.contact, event.recurring, event.id]);
   });
+  return event.id;
 }
+
+app.get('/event/:id', (req, res) => {
+  getEvent(req.params.id)
+    .then(event => {
+      res.json(event);
+    })
+    .catch(err => {
+      console.error(err.message);
+      res.status(500).send(err.message);
+    });
+});
 
 app.get('/events', (req, res) => {
   getEvents().then(events => {
@@ -575,26 +601,27 @@ app.get('/events', (req, res) => {
   });
 })
 
-app.post("/events", (req, res) => {
-  const {
-    title,
-    description,
-    date,
-    location,
-    contact,
-  } = req.body;
-
+app.post("/events", async (req, res) => {
   const event = {
-    title,
-    description,
-    date,
-    location,
-    contact,
+    id: req.body?.id,
+    title: req.body?.title,
+    description: req.body?.description,
+    timestamp: req.body?.timestamp,
+    location: req.body?.location,
+    contact: req.body?.contact,
+    recurring: req.body?.recurring,
   };
 
-  createEvent(event);
+  let eventId;
+  if (event?.id) {
+    eventId = await updateEvent(event);
+  } else {
+    eventId = await createEvent(event);
+  }
 
-  res.status(201).send('Event created');
+  const eventResponse = await getEvent(eventId);
+
+  res.json(eventResponse);
 });
 
 app.put("/event/:id", async (req, res) => {
@@ -610,9 +637,9 @@ app.put("/event/:id", async (req, res) => {
   res.json(updatedMember);
 });
 
-app.delete('/events/:id', (req, res ) => 
+app.delete('/event/:id', async(req, res ) => 
 {
-  deleteEvent(req.params.id);
+  await deleteEvent(req.params.id);
 
   res.status(200).send('Event deleted');
 });

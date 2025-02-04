@@ -1,6 +1,8 @@
 
 import axios from "axios";
 import formModeEnum from "./formModeEnum";
+import { convertToISOFormat } from "./formatDate";
+import { toast } from 'react-toastify';
 
 const getAllArticles = async () => {
   const response = await axios.get(`${process.env.REACT_APP_API}/articles`);
@@ -51,6 +53,11 @@ const getMinute = async (id) => {
   return response.data;
 }
 
+const getEvent = async (id) => {
+  const response = await axios.get(`${process.env.REACT_APP_API}/event/${id}`);
+  return response.data;
+}
+
 const getAllEvents = async () => {
   const response = await axios.get(`${process.env.REACT_APP_API}/events`);
   return response.data;
@@ -90,13 +97,17 @@ const submitMinute = async (id, data, document, mode) => {
   return response.data;
 };
 
-const submitMember = async (id, data, image, mode) => {
+const submitMember = async (data, image) => {
   const formData = new FormData();
 
-  // Append text fields to formData
+  if (data?.id) {
+    formData.append("id", data.id);
+  }
   formData.append("name", data.name);
   formData.append("position", data.position);
   formData.append("order", data.order);
+  formData.append("role", data.role);
+  formData.append("type", "committee");
 
   // Append the selected image to formData
   if (image?.file) {
@@ -105,81 +116,135 @@ const submitMember = async (id, data, image, mode) => {
     formData.append("existing_image", data.image);
   }
 
-  if (mode === formModeEnum.UPDATE) {
-    formData.append("id", id);
-  }
-
-  let response;
-  if (mode === formModeEnum.CREATE) {
-    response = await axios.post(`${process.env.REACT_APP_API}/member`, formData, {
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API}/member`, formData, {
       headers: { "Content-Type": "multipart/form-data" }
     });
-  } else if (mode === formModeEnum.UPDATE) {
-    response = await axios.put(`${process.env.REACT_APP_API}/member/${id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" }
-    });
-  }
+    toast.success(`Member ${data?.id ? 'updated' : 'created'} successfully`);
+    return response.data;
+  } catch (error) {
 
-  return response.data;
+  }
 };
 
 const submitArticle = async (data, images) => {
-    const formData = new FormData();
+  const formData = new FormData();
 
-    // Append text fields to formData
-    if (data?.id) {
-      formData.append("id", data.id);
+  // Append text fields to formData
+  if (data?.id) {
+    formData.append("id", data.id);
+  }
+  formData.append("title", data.title);
+  formData.append("text", data.text);
+  formData.append("date", data.date);
+  formData.append("is_event", data.is_event);
+  formData.append("is_aid", data.is_aid);
+  formData.append("is_guest", data.is_guest);
+  formData.append("is_project", data.is_project);
+  formData.append("is_home", data.is_home);
+  formData.append("is_sport", data.is_sport);
+  formData.append("type", "article");
+
+
+  // Append the selected images to formData
+  images.forEach((image) => {
+    if (image instanceof File) {
+      formData.append("images", image);
     }
-    formData.append("title", data.title);
-    formData.append("text", data.text);
-    formData.append("date", data.date);
-    formData.append("is_event", data.is_event);
-    formData.append("is_aid", data.is_aid);
-    formData.append("is_guest", data.is_guest);
-    formData.append("is_project", data.is_project);
-    formData.append("is_home", data.is_home);
-    formData.append("is_sport", data.is_sport);
-    formData.append("type", "article");
+    else {
+      formData.append("existing_images[]", image.image);
+    }
+  });
 
-
-    // Append the selected images to formData
-    images.forEach((image) => {
-      if (image instanceof File) {
-        formData.append("images", image);
-      }
-      else {
-        formData.append("existing_images[]", image.image);
-      }
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API}/article`, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
     });
-
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_API}/article`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      return response.data;
-    } catch (error) {
-
-    }
-  };
+    toast.success(`Article ${data?.id ? 'updated' : 'created'} successfully`);
+    return response.data;
+  } catch (error) {
+    toast.error(`Error creating article`);
+  }
+};
 
 
-  const deleteArticleImage = async (id) => {
-    try {
-      const response = await axios.delete(`${process.env.REACT_APP_API}/article/image/${id}`);
-      return response.data;
-    } catch (error) {
+const submitEvent = async (data) => {
+  const formData = new FormData();
+  
+  data.timestamp = convertToISOFormat(data.timestamp);
 
-    }
+  if (data?.id) {
+    formData.append("id", data.id);
   }
 
+  // Append text fields to formData
+  formData.append("title", data.title);
+  formData.append("description", data.description);
+  formData.append("timestamp", data.timestamp);
+  formData.append("location", data.location);
+  formData.append("contact", data.contact);
+  formData.append("recurring", data.recurring);
 
-  const fetch = axios.create({
-    baseURL: process.env.REACT_APP_API, // Set your base URL here
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API}/events`, formData, {
+      headers: { "Content-Type": "application/json" }
+    });
+    toast.success(`Event ${data?.id ? 'updated' : 'created'} successfully`);
+    return response.data;
+  } catch (error) {
+    toast.error(`Error creating event`);
+  }
+};
+
+
+
+const deleteArticleImage = async (id) => {
+  try {
+    const response = await axios.delete(`${process.env.REACT_APP_API}/article/image/${id}`);
+    return response.data;
+  } catch (error) {
+
+  }
+}
+
+
+const fetch = axios.create({
+  baseURL: process.env.REACT_APP_API, // Set your base URL here
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+
+const deleteMember = async (id) => {
+  try {
+    const response = await axios.delete(`${process.env.REACT_APP_API}/member/${id}`);
+    toast.success(`Member deleted successfully`);
+    return response.data;
+  } catch (error) {
+    toast.error(`Error deleting member`);
+  }
+}
+
+const deleteArticle = async (id) => {
+  try {
+    const response = await axios.delete(`${process.env.REACT_APP_API}/article/${id}`);
+    toast.success(`Article deleted successfully`);
+    return response.data;
+  } catch (error) {
+    toast.error(`Error deleting article`);
+  }
+}
+
+const deleteEvent = async (id) => {
+  try {
+    const response = await axios.delete(`${process.env.REACT_APP_API}/event/${id}`);
+    toast.success(`Event deleted successfully`);
+    return response.data;
+  } catch (error) {
+    toast.error(`Error deleting event`);
+  }
+}
 
 
 
@@ -191,6 +256,7 @@ export {
   getAllMembers,
   getArticle,
   getMember,
+  getEvent,
   getAllMinutes,
   getAllEvents,
   submitMinute,
@@ -199,4 +265,8 @@ export {
   submitArticle,
   deleteArticleImage,
   fetch,
+  submitEvent,
+  deleteMember,
+  deleteArticle,
+  deleteEvent,
 }
