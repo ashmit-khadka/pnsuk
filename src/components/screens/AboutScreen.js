@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "react-bootstrap";
 import Breadcrumbs from "../Breadcrumbs";
+import Button from "../Button";
 
 const AboutScreen = () => {
 
@@ -12,7 +12,7 @@ const AboutScreen = () => {
           <p>{description}</p>
           <Button
             onClick={() => window.open(link, "_blank")}
-            variant="primary"
+            variant="default"
           >Read More</Button>
         </div>
         <div className={`flex-3 ${flip ? 'order-1' : 'order-2'} w-full`}>
