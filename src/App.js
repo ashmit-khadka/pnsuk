@@ -39,7 +39,7 @@ function App() {
               <Route path="events" element={<EventsScreen />} />
               <Route path="admin" element={<Login />} />
               <Route path="about" element={<AboutScreen />} />
-              <Route path="coming-soon" element={<ComingSoonScreen />} />
+              <Route path="soon" element={<ComingSoonScreen />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="admin/dashboard/:type" element={<List />} />
                 <Route path="admin/article" element={<ArticleForm />} />
