@@ -20,7 +20,7 @@ import Footer from './components/Footer';
 import ProtectedRoute from './ProtectedRoute';
 import { LoginProvider } from './LoginContext';
 import { BrowserRouter } from 'react-router';
-import ComingSoonScreen from './components/screens/ComingSoonScreen';
+import SoonScreen from './components/screens/SoonScreen';
 
 function App() {
   return (
@@ -39,7 +39,7 @@ function App() {
               <Route path="events" element={<EventsScreen />} />
               <Route path="admin" element={<Login />} />
               <Route path="about" element={<AboutScreen />} />
-              <Route path="soon" element={<ComingSoonScreen />} />
+              <Route path="soon" element={<SoonScreen />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="admin/dashboard/:type" element={<List />} />
                 <Route path="admin/article" element={<ArticleForm />} />

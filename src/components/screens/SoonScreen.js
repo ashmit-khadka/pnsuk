@@ -1,8 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import Button from '../Button';
 
-const ComingSoonScreen = () => {
+const SoonScreen = () => {
   const navigate = useNavigate(); 
 
   return (
@@ -14,4 +14,4 @@ const ComingSoonScreen = () => {
   );
 };
 
-export default ComingSoonScreen;
+export default SoonScreen;
