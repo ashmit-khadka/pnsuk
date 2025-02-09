@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Member from "../Member";
 import { getAllMembers } from "../../services/services";
 import Breadcrumbs from "../Breadcrumbs";

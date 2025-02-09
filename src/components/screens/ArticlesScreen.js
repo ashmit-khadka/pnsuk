@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Article from "../Article";
 import { ReactComponent as IconTeam } from '../../assets/icons/noun-team.svg';
 import { ReactComponent as IconHeart } from '../../assets/icons/noun-heart.svg';
 import { ReactComponent as IconTrophy } from '../../assets/icons/noun-trophy.svg';
 import { ReactComponent as IconUnderline } from '../../assets/icons/noun-underline.svg';
-import ImageEvents from '../../assets/images/pexels-diohasbi-3280130.jpg'; // Import the JPG image
 import Button from '../Button';
 import Breadcrumbs from '../Breadcrumbs'
+import { getAllArticles } from "../../services/services";
 
 const ArticlesScreen = () => {
 
@@ -28,11 +27,11 @@ const ArticlesScreen = () => {
 
 
   useEffect(() => {
-    axios.get('http://localhost:3001/articles')
+    getAllArticles()
       .then((response) => {
-        const articles = response.data;
-        const donations = response.data.filter(article => article.is_aid);
-        const sports = response.data.filter(article => article.is_sport);
+        const articles = response;
+        const donations = response.filter(article => article.is_aid);
+        const sports = response.filter(article => article.is_sport);
         setArticles({
           articles: { ...articles.articles, items: articles },
           donations: { ...articles.donations, items: donations },
