@@ -12,6 +12,7 @@ const mainLinks = [
   { path: "/events", label: "Events" },
   { path: "/projects", label: "Projects" },
   { path: "/committee", label: "Committee" },
+  { path: "/gallery", label: "Gallery" },
   { path: "/about", label: "About us" }
 ];
 

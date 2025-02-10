@@ -107,7 +107,7 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      <div className="max-w-page w-full pt-4 px-8 pb-12 rounded-lg mt-4 mb-16" style={{ boxShadow: '0px 5px 25px rgba(0, 0, 0, 0.1)' }}>
+      <div className="max-w-page w-full pt-4 px-8 pb-12 rounded-lg mt-4 mb-16" style={{ boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.15)' }}>
         <h2 className="font-lora text-4xl font-bold text-center pt-2 pb-8">What we do</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-8">
           <WhatWeDoItem

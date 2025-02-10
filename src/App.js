@@ -21,6 +21,7 @@ import ProtectedRoute from './ProtectedRoute';
 import { LoginProvider } from './LoginContext';
 import { BrowserRouter } from 'react-router';
 import SoonScreen from './components/screens/SoonScreen';
+import GalleryScreen from './components/screens/GalleryScreen';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
               <Route path="admin" element={<Login />} />
               <Route path="about" element={<AboutScreen />} />
               <Route path="soon" element={<SoonScreen />} />
+              <Route path="gallery" element={<GalleryScreen />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="admin/dashboard/:type" element={<List />} />
                 <Route path="admin/article" element={<ArticleForm />} />
