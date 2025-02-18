@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { getMember, submitMember, deleteMember } from "../../services/services";
 import FormFieldTextbox from "./form/FormFieldTextbox";
 import FormFieldFile from "./form/FormFieldFile";
+import FormFieldDropdown from "./form/FormFieldDropdown";
 import Button from "../Button";
 import { toast } from 'react-toastify';
 
@@ -86,14 +87,21 @@ const MemberForm = (props) => {
         />
       </div>
       <div className="mb-4">
-        <FormFieldTextbox
+        <FormFieldDropdown
           id="role"
           label="Role"
           register={register}
           errors={errors}
           validation={{
-            required: "Enter the member role"
+            required: "Select the member role"
           }}
+          options={[
+            { value: "Management", label: "Management" },
+            { value: "Trustee", label: "Trustee" },
+            { value: "Volunteer", label: "Volunteer" },
+            { value: "Member", label: "Member" },
+            { value: "Advisor", label: "Advisor" }
+          ]}
           className="w-full px-3 py-2 border border-themeDark rounded-md"
         />
       </div>

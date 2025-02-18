@@ -56,7 +56,7 @@ const ArticlesScreen = () => {
         </div>
 
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-page">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-page w-full">
         {articles[type].items.slice(0, articles[type].viewAll ? articles.length : numberToDisplay).map(article => (
           <Article
             key={article.id}

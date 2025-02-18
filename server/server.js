@@ -363,7 +363,7 @@ app.post("/member", upload.single("image"), async (req, res) => {
   const member = {
     id: req.body?.id,
     name: req.body?.name,
-    image: req?.files?.filename || req?.body?.existing_image,
+    image: req?.file?.filename || req?.body?.existing_image,
     position: req.body?.position,
     role: req.body?.role,
     order: req.body?.order,
@@ -562,7 +562,7 @@ const createEvent = async (event) => {
   const eventId = uuidv4();
 
   db.serialize(() => {
-    db.run('INSERT INTO events (id, title, description, timestamp, location, contact, recurring) VALUES (?, ?, ?, ?, ?, ?, ?);', [eventId, event.title, event.description, event.date, event.location, event.contact, event.recurring]);
+    db.run('INSERT INTO events (id, title, description, timestamp, location, contact, recurring) VALUES (?, ?, ?, ?, ?, ?, ?);', [eventId, event.title, event.description, event.timestamp, event.location, event.contact, event.recurring]);
   });
 
   return eventId;

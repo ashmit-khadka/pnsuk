@@ -85,6 +85,7 @@ const HomeScreen = () => {
         </div>
 
         <div className="col-span-4 relative" style={{ rounded: '50%' }}>
+          {/* <img className="w-full h-96 object-cover rounded-lg" src={`${process.env.REACT_APP_HOST}/assets/media/images/banner.png`} alt="placeholder" /> */}
           
           <Carousel>
             {data?.images?.map((article) =>

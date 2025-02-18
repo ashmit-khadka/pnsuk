@@ -19,15 +19,15 @@ const ArticleForm = (props) => {
 
   const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm({
     defaultValues: {
-      title: "Default Title",
-      description: "ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum id, tincidunt nunc",
-      text: "Default Text",
-      date: new Date().toISOString().split('T')[0],
+      title: "",
+      description: "",
+      text: "",
+      date: null,
       is_event: false,
       is_aid: false,
       is_guest: false,
       is_project: false,
-      is_home: true,
+      is_home: false,
       is_sport: false,
       images: []
     }
@@ -96,7 +96,7 @@ const ArticleForm = (props) => {
           />
         </div>
         <div className="mb-4">
-          <FormFieldTextbox
+          <FormFieldDate
             id="date"
             label="Date"
             register={register}
@@ -107,7 +107,7 @@ const ArticleForm = (props) => {
             className="w-full px-3 py-2 border border-themeDark rounded-md"
           />
         </div>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <FormFieldCheckbox
             id="is_event"
             label="Is Event"
@@ -116,18 +116,18 @@ const ArticleForm = (props) => {
             validation={{}}
             className="w-full px-3 py-2 border border-themeDark rounded-md"
           />
-        </div>
+        </div> */}
         <div className="mb-4">
           <FormFieldCheckbox
             id="is_aid"
-            label="Is Aid"
+            label="Include in Donations section of project page"
             register={register}
             errors={errors}
             validation={{}}
             className="w-full px-3 py-2 border border-themeDark rounded-md"
           />
         </div>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <FormFieldCheckbox
             id="is_guest"
             label="Is Guest"
@@ -136,8 +136,8 @@ const ArticleForm = (props) => {
             validation={{}}
             className="w-full px-3 py-2 border border-themeDark rounded-md"
           />
-        </div>
-        <div className="mb-4">
+        </div> */}
+        {/* <div className="mb-4">
           <FormFieldCheckbox
             id="is_project"
             label="Is Project"
@@ -146,8 +146,8 @@ const ArticleForm = (props) => {
             validation={{}}
             className="w-full px-3 py-2 border border-themeDark rounded-md"
           />
-        </div>
-        <div className="mb-4">
+        </div> */}
+        {/* <div className="mb-4">
           <FormFieldCheckbox
             id="is_home"
             label="Is Home"
@@ -156,11 +156,11 @@ const ArticleForm = (props) => {
             validation={{}}
             className="w-full px-3 py-2 border border-themeDark rounded-md"
           />
-        </div>
+        </div> */}
         <div className="mb-4">
           <FormFieldCheckbox
             id="is_sport"
-            label="Is Sport"
+            label="Include in Sports section of project page"
             register={register}
             errors={errors}
             validation={{}}

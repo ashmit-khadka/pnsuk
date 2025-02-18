@@ -20,7 +20,7 @@ const adminLinks = [
   { path: "/admin/dashboard/articles", label: "Projects" },
   { path: "/admin/dashboard/events", label: "Events" },
   { path: "/admin/dashboard/committee", label: "Committee" },
-  { path: "/admin/dashboard/minutes", label: "Minutes" },
+  //{ path: "/admin/dashboard/minutes", label: "Minutes" },
 ];
 
 const Navigation = () => {
