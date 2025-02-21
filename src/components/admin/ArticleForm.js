@@ -17,19 +17,19 @@ const ArticleForm = (props) => {
   const isEditMode = state?.id ? true : false;
 
   const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm({
-    defaultValues: {
-      title: "",
-      description: "",
-      text: "",
-      date: null,
-      is_event: false,
-      is_aid: false,
-      is_guest: false,
-      is_project: false,
-      is_home: false,
-      is_sport: false,
-      images: []
-    }
+    // defaultValues: {
+    //   title: "",
+    //   description: "",
+    //   text: "",
+    //   date: null,
+    //   is_event: false,
+    //   is_aid: false,
+    //   is_guest: false,
+    //   is_project: false,
+    //   is_home: false,
+    //   is_sport: false,
+    //   images: []
+    // }
   });
 
   const [selectedImages, setSelectedImages] = useState([]);

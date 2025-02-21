@@ -15,13 +15,13 @@ const MemberForm = (props) => {
   const isEditMode = state?.id ? true : false;
 
   const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm({
-    defaultValues: {
-      name: "New Member Name",
-      image: "New Member Image",
-      role: "Advisor",
-      position: "Advisor",
-      order: 1,
-    }
+    // defaultValues: {
+    //   name: "New Member Name",
+    //   image: "New Member Image",
+    //   role: "Advisor",
+    //   position: "Advisor",
+    //   order: 1,
+    // }
   });
 
   const [selectedImage, setSelectedImage] = useState(null);

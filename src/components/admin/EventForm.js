@@ -14,14 +14,14 @@ const EventForm = () => {
   const navigate = useNavigate();
   const isEditMode = state?.id ? true : false;
   const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm({
-    defaultValues: {
-      title: "Default Title",
-      description: "Default Description",
-      date: "2024-12-29T09:00:00",
-      location: "Location",
-      contact: "Contact",
-      recurring: "none",
-    }
+    // defaultValues: {
+    //   title: "Default Title",
+    //   description: "Default Description",
+    //   date: "2024-12-29T09:00:00",
+    //   location: "Location",
+    //   contact: "Contact",
+    //   recurring: "none",
+    // }
   });
 
   const onSubmit = async (data) => {

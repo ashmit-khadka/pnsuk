@@ -11,10 +11,10 @@ const Login = () => {
   const navigate = useNavigate();
   const { setLoginState } = useContext(LoginContext);
   const { register, handleSubmit, formState: { errors } } = useForm({
-      defaultValues: {
-        username: "admin",
-        password: "admin",
-      }
+      // defaultValues: {
+      //   username: "admin",
+      //   password: "admin",
+      // }
     });
 
   const [hasLoginFailed, setHasLoginFailed] = useState(false);
