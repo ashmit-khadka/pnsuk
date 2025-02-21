@@ -34,7 +34,7 @@ const ArticleScreen = (props) => {
           { text: article.title }
         ]}
       />
-      
+
       <div>
         <h1 className="font-lora font-bold mb-4">{article.title}</h1>
         <div className="flex items-center gap-4">
@@ -48,9 +48,13 @@ const ArticleScreen = (props) => {
 
         <Carousel>
           {article.images && article.images.map((image) =>
-            <Carousel.Item>
-              <img key={image.id} src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${image.image}`} alt={image.title} />
-
+            <Carousel.Item className="d-flex justify-content-center align-items-center">
+              <img
+                className="img-fluid"
+                key={image.id}
+                src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${image.image}`}
+                alt={image.title}
+              />
               {/* <Carousel.Caption>
                 <h3>First slide label</h3>
                 <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>

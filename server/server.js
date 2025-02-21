@@ -448,7 +448,7 @@ const deleteMinutes = (id) => {
 }
 
 const getMinute = async (id) => {
-  const minute = await dbAllAsync('SELECT * FROM minutes WHERE id = ?;', db, [id]);
+  const minute = (await dbAllAsync('SELECT * FROM minutes WHERE id = ?;', db, [id]))[0];
   // add file path to minute object.
   minute.filePath = `${minutesPath}${minute.file}`;
   return minute;

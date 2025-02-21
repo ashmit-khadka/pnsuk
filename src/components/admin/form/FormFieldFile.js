@@ -1,11 +1,12 @@
 import React, { useRef } from "react";
 import Button from "../../Button";
+import { has } from "lodash";
 
 const FormFieldFile = (props) => {
   const { id, label, register, errors, validation, selectedFile, setSelectedFile, hasImage = false, labelClassName } = props;
   const fileInputRef = useRef(null);
 
-  const fileImage = hasImage ? (selectedFile?.image || selectedFile?.preview) : ''
+  const fileImage = hasImage ? (selectedFile?.image || selectedFile?.preview) : `${process.env.REACT_APP_HOST}/assets/media/images/defaults/file.jpeg`;
   const fileName = selectedFile?.file?.name || selectedFile?.name;
 
   const handleFileChange = (e) => {
@@ -28,7 +29,14 @@ const FormFieldFile = (props) => {
   };
 
   const onOpenFile = () => {
-    window.open(selectedFile?.name, '_blank');
+    window.open(selectedFile?.preview, '_blank');
+  };
+
+  const getButtonLabel = () => {
+    if (selectedFile?.name) {
+      return hasImage ? 'Change Image' : 'Change File';
+    }
+    return hasImage ? 'Add Image +' : 'Add File +';
   };
 
   return (
@@ -43,7 +51,7 @@ const FormFieldFile = (props) => {
       />
 
       <Button type="button" onClick={handleClick}>
-        {hasImage ? 'Add Image +' : 'Add File +'}
+        {getButtonLabel()}
       </Button>
 
       {errors[id] && <span>{errors[id].message}</span>}
