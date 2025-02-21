@@ -5,11 +5,17 @@ import LoginContext from './../../LoginContext';
 import { useForm } from "react-hook-form";
 import FormFieldTextbox from './form/FormFieldTextbox';
 import Button from "../Button";
+import Cookies from 'js-cookie';
 
 const Login = () => {
   const navigate = useNavigate();
   const { setLoginState } = useContext(LoginContext);
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm({
+      defaultValues: {
+        username: "admin",
+        password: "admin",
+      }
+    });
 
   const [hasLoginFailed, setHasLoginFailed] = useState(false);
 
@@ -19,7 +25,8 @@ const Login = () => {
       password: data.password
     }).then((response) => {
       if (response.status === 200) {
-        setLoginState(true);
+        //setLoginState(true);
+        Cookies.set('login', true, { expires: 7 });
         navigate("/admin/dashboard/articles");
       }
     }).catch((error) => {

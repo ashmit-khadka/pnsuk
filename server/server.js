@@ -13,6 +13,9 @@ const http = require('http');
 
 
 const defaultEvents = require('./backup/defaults/events.json');
+//const defaultArticles = require('./backup/defaults/articles.json');
+
+const minutesPath = 'assets/media/docs/minutes/';
 
 // Set up storage with Multer
 const storage = multer.diskStorage({
@@ -28,6 +31,9 @@ const storage = multer.diskStorage({
       case 'image':
         path = 'public/assets/media/member_imgs/';
         break;
+        case 'minutes':
+          path = `public/${minutesPath}`;
+          break;
     }
     cb(null, path); // Set upload folder
   },
@@ -417,18 +423,22 @@ app.get('/member/:id', async (req, res) => {
  * }
  */
 
-const creatMinutes = (minutes) => {
+const createMinutes = (minutes) => {
   const minutesId = uuidv4();
 
   db.serialize(() => {
     db.run('INSERT INTO minutes (id, title, description, date, file) VALUES (?, ?, ?, ?, ?);', [minutesId, minutes.title, minutes.description, minutes.date, minutes.file]);
   });
+
+  return minutesId;
 };
 
 const updateMinutes = (minutes) => {
   db.serialize(() => {
     db.run('UPDATE minutes SET title = ?, description = ?, date = ?, file = ? WHERE id = ?;', [minutes.title, minutes.description, minutes.date, minutes.file, minutes.id]);
   });
+
+  return minutes.id;
 };
 
 const deleteMinutes = (id) => {
@@ -438,14 +448,10 @@ const deleteMinutes = (id) => {
 }
 
 const getMinute = async (id) => {
-  return new Promise((resolve, reject) => {
-    db.get('SELECT * FROM minutes WHERE id = ?;', [id], (err, row) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(row);
-    });
-  });
+  const minute = await dbAllAsync('SELECT * FROM minutes WHERE id = ?;', db, [id]);
+  // add file path to minute object.
+  minute.filePath = `${minutesPath}${minute.file}`;
+  return minute;
 }
 
 const getMinutes = async (id) => {
@@ -475,19 +481,26 @@ app.get('/minutes', (req, res) => {
     });
 });
 
-app.post('/minutes', upload.single("document"), (req, res) => {
+app.post('/minutes', upload.single("document"), async (req, res) => {
   const minutes = req.body;
 
   const minute = {
+    id: minutes.id,
     title: minutes.title,
     description: minutes.description,
     date: minutes.date,
-    file: req.file.filename,
+    file: req?.file?.filename || req?.body?.existing_document,
   }
 
-  creatMinutes(minute);
+  if (minute?.id) {
+    await updateMinutes(minute);
+  } else {
+    const newMinuteId = await createMinutes(minute);
+    minute.id = newMinuteId;
+  }
 
-  res.status(201).send('Minutes created');
+  const minuteResponse = await getMinute(minute.id);
+  res.json(minuteResponse);
 });
 
 app.put('/minutes/:id', upload.single("document"), async (req, res) => {
@@ -506,9 +519,8 @@ app.put('/minutes/:id', upload.single("document"), async (req, res) => {
   res.json(updatedMinute)
 });
 
-app.delete('/minutes/:id', (req, res) => {
-  deleteMinutes(req.params.id);
-
+app.delete('/minutes/:id', async (req, res) => {
+  await deleteMinutes(req.params.id);
   res.status(200).send('Minutes deleted');
 });
 
@@ -711,6 +723,9 @@ app.get('/migrate', async (req, res) => {
 
   articles.forEach(async article => {
     const articleId = uuidv4();
+    // convert article.date to timestamp
+    article.date = new Date(article.date).toISOString();
+
     // if image begins with 'article_imgs/' remove it
     const formatedImage = article.image.split('article_imgs/').join('');
 
@@ -739,6 +754,7 @@ app.get('/migrate', async (req, res) => {
   minutes.forEach(async minute => {
     const minuteId = uuidv4();
     const formatedFile = minute.file.split('minute_docs/').join('');
+    minute.date = new Date(minute.date).toISOString();
     await dbRunAsync('INSERT INTO minutes (id, title, file, description, date) VALUES (?, ?, ?, ?, ?);', db, [minuteId, formatedFile, formatedFile, minute.description, minute.date]);
   });
 

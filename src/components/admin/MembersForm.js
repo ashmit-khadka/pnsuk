@@ -43,8 +43,8 @@ const MemberForm = (props) => {
 
   const onSubmit = async (data) => {
     const response = await submitMember(data, selectedImage);
-    updateForm(response)
-    navigate(-1);
+    //updateForm(response)
+    navigate('/admin/dashboard/members');
   };
 
   const onDelete = async (id) => {

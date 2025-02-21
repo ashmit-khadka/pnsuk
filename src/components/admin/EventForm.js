@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from 'react-router';
 import { useNavigate } from "react-router";
 import { deleteEvent, getEvent } from "../../services/services";
 import FormFieldTextbox from "./form/FormFieldTextbox";
 import FormFieldDate from "./form/FormFieldDate";
-import FormFieldFile from "./form/FormFieldFile";
 import FormFieldDropdown from "./form/FormFieldDropdown";
 import Button from "../Button";
 import { submitEvent } from "../../services/services";
@@ -28,7 +26,8 @@ const EventForm = () => {
 
   const onSubmit = async (data) => {
     const response = await submitEvent(data);
-    updateForm(response)
+    //updateForm(response)
+    navigate('/admin/dashboard/events');
   };
 
   const updateForm = (event) => {
@@ -57,7 +56,7 @@ const EventForm = () => {
   }, [state, reset]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-page w-full">
       <div className="mb-4">
         <FormFieldTextbox
           id="title"

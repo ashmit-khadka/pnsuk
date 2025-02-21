@@ -6,6 +6,7 @@ const FormFieldFile = (props) => {
   const fileInputRef = useRef(null);
 
   const fileImage = hasImage ? (selectedFile?.image || selectedFile?.preview) : ''
+  const fileName = selectedFile?.file?.name || selectedFile?.name;
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -24,6 +25,10 @@ const FormFieldFile = (props) => {
 
   const handleClick = () => {
     fileInputRef.current.click();
+  };
+
+  const onOpenFile = () => {
+    window.open(selectedFile?.name, '_blank');
   };
 
   return (
@@ -52,7 +57,7 @@ const FormFieldFile = (props) => {
             alt="Preview"
           />
           <div className="w-full flex flex-col gap-2">
-            <span>{selectedFile.name}</span>
+            <span onClick={() => onOpenFile()}>{fileName}</span>
             <Button variant="red" type="button" onClick={handleDeleteFile}>Delete</Button>
           </div>
 

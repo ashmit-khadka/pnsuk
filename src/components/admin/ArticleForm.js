@@ -16,7 +16,6 @@ const ArticleForm = (props) => {
 
   const isEditMode = state?.id ? true : false;
 
-
   const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm({
     defaultValues: {
       title: "",
@@ -54,7 +53,8 @@ const ArticleForm = (props) => {
   // submit form
   const onSubmit = async (data) => {
     const response = await submitArticle(data, selectedImages);
-    resetForm(response);
+    //resetForm(response);
+    navigate('/admin/dashboard/articles');
   }
 
   const onDelete = async (id) => {

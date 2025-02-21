@@ -6,12 +6,15 @@ import Navbar from 'react-bootstrap/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../assets/images/logo.png';
 import LoginContext from "../LoginContext";
+import Cookies from 'js-cookie';
+import { useLocation, useNavigate } from 'react-router';
 
 const mainLinks = [
   { path: "/", label: "Home" },
   { path: "/events", label: "Events" },
   { path: "/projects", label: "Projects" },
   { path: "/committee", label: "Committee" },
+  { path: "/minutes", label: "Minutes" },
   { path: "/gallery", label: "Gallery" },
   { path: "/about", label: "About us" }
 ];
@@ -20,14 +23,18 @@ const adminLinks = [
   { path: "/admin/dashboard/articles", label: "Projects" },
   { path: "/admin/dashboard/events", label: "Events" },
   { path: "/admin/dashboard/committee", label: "Committee" },
-  //{ path: "/admin/dashboard/minutes", label: "Minutes" },
+  { path: "/admin/dashboard/minutes", label: "Minutes" },
 ];
 
 const Navigation = () => {
   const { loginState, setLoginState } = useContext(LoginContext);
+  console.log({loginState});
+  const navigate = useNavigate();
 
   const logOut = () => {
+    Cookies.remove('login');
     setLoginState(false);
+    navigate("/admin");
   };
 
   const [navLinks, setNavLinks] = useState([]);

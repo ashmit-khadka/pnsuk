@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { getAllArticles, getAllMinutes, getAllEvents, getAllMembers } from '../../services/services';
 import Button from '../Button';
+import moment from 'moment';
 
 const List = ({ elementType = 'minute' }) => {
 
@@ -27,7 +28,7 @@ const List = ({ elementType = 'minute' }) => {
             data: article, // Store the entire article object in the data property
             columns: {
             title: <div className="font-bold">{article.title}</div>, 
-            date: article.date,
+            date: moment(article.date).format("MMMM Do YYYY h:mm a"),
             text: article.text,
             //image: <img className='w-16 h-16 object-cover rounded-full' src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${article.images[0]?.image || ""}`} alt={article.title} />,
             },
@@ -46,7 +47,7 @@ const List = ({ elementType = 'minute' }) => {
             columns: {
               title: <div className="font-bold">{minute.title}</div>,
               description: minute.description,
-              date: minute.date,
+              date: moment(minute.timestamp).format("MMMM Do YYYY h:mm a"),
               file: minute.file,
             },
             searchFilds: ['title', 'description', 'date', 'file'],
@@ -64,7 +65,7 @@ const List = ({ elementType = 'minute' }) => {
             columns: {
               title: <div className="font-bold">{event.title}</div>,
               description: event.description,
-              date: event.timestamp,
+              date: moment(event.timestamp).format("MMMM Do YYYY h:mm a"),
               location: event.location,
               contact: event.contact,
               recurring: <div className="capitalize">{event.recurring}</div>,

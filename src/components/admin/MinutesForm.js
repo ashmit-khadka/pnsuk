@@ -1,33 +1,32 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useForm } from "react-hook-form";
-import { useLocation } from 'react-router';
-import { getMember, getMinute, submitMinute } from "../../services/services";
+import { useLocation, useNavigate } from 'react-router';
+import { getMinute, submitMinute, deleteMinute } from "../../services/services";
 import FormFieldTextbox from "./form/FormFieldTextbox";
 import FormFieldDate from "./form/FormFieldDate";
 import FormFieldFile from "./form/FormFieldFile";
-
-const FORM_MODE = {
-  CREATE: "create",
-  UPDATE: "update",
-}
+import Button from "../Button";
 
 const MinutesForm = (props) => {
   const { state } = useLocation();
+  const navigate = useNavigate();
+  const isEditMode = state?.id ? true : false;
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
-    defaultValues: {
-      title: "Exmple title",
-      description: "Example description",
-      date: new Date().toISOString().split('T')[0],
-      order: 1,
-    }
+  const { register, handleSubmit, formState: { errors, isDirty }, reset, } = useForm({
+    // defaultValues: {
+    //   title: "Exmple title",
+    //   description: "Example description",
+    //   date: new Date().toISOString().split('T')[0],
+    //   order: 1,
+    // }
   });
 
   const [selectedDocument, setSelectedDocument] = useState(null);
-  const [mode, setMode] = useState(FORM_MODE.CREATE);
 
-  const updateForm = (data) => {    reset({
+  // update the form with the data from the selected minute
+  const updateForm = (data) => {
+    reset({
+      id: data.id,
       title: data.title,
       description: data.description,
       date: data.date,
@@ -36,28 +35,37 @@ const MinutesForm = (props) => {
     setSelectedDocument({
       name: data.file,
       file: null,
+      preview: `${process.env.REACT_APP_HOST}/${data.filePath}`
     })
   }
 
-  const onMinuteSubmit = async (data) => {
-    const response = await submitMinute(state.id, data, selectedDocument, mode);
-    updateForm(response)    
-    setSelectedDocument(null);
+  // submit the minute data to the server
+  const onSubmit = async (data) => {
+    await submitMinute(data, selectedDocument);
+    navigate('/admin/dashboard/minutes');
   };
 
+  // get the minute data from the server
+  const getSelectedMinute = async (id) => {
+    const response = await getMinute(id);
+    updateForm(response);
+  }
+
+  // delete the selected minute
+  const onDelete = async (id) => {
+    await deleteMinute(id);
+    navigate('/admin/dashboard/minutes');
+  }
 
   useEffect(() => {
-    if (state?.id) {
-      getMinute(state.id).then((data) => {
-        updateForm(data)
-        setMode(FORM_MODE.UPDATE);
-      });
+    if (isEditMode) {
+      getSelectedMinute(state.id);
     }
   }, [state]);
 
 
   return (
-<form onSubmit={handleSubmit(onMinuteSubmit)} className="max-w-page mx-auto p-6 bg-themeLight rounded-lg shadow-md">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-page w-full">
       <div className="mb-4">
         <FormFieldTextbox
           id="title"
@@ -107,9 +115,14 @@ const MinutesForm = (props) => {
           labelClassName="text-themeDark font-bold mb-2"
         />
       </div>
-      <button type="submit" className="bg-themePrimary text-white font-bold py-2 px-4 rounded hover:bg-themeDark">
-        Save
-      </button>
+      <div className="flex justify-end gap-4">
+        <Button variant="default" type="submit" disabled={!isDirty}>Save</Button>
+        <Button variant="default" type="button" onClick={() => navigate(-1)}>Cancel</Button>
+        {
+          isEditMode &&
+          <Button variant="red" type="button" onClick={() => onDelete(state.id)}>Delete</Button>
+        }
+      </div>
     </form>
   );
 };

@@ -4,6 +4,7 @@ import { fetch } from "../../services/services";
 import Article from "../Article";
 import Carousel from 'react-bootstrap/Carousel';
 import Breadcrumbs from "../Breadcrumbs";
+import moment from 'moment';
 
 
 const ArticleScreen = (props) => {
@@ -40,7 +41,7 @@ const ArticleScreen = (props) => {
           <img className="w-12 h-12 rounded-full" src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${article.images && article.images[0].image}`} alt={article.title} />
           <div>
             <p className="m-0" >{"By Peterborough Nepalese Society"}</p>
-            <time>{article.date}</time>
+            <time>{`${moment(article.date).format('Do MMMM YYYY')}`}</time>
           </div>
         </div>
         <p className="mt-8 mb-4">{article.text}</p>

@@ -63,14 +63,18 @@ const getAllEvents = async () => {
   return response.data;
 }
 
-const submitMinute = async (id, data, document, mode) => {
+const submitMinute = async (data, document) => {
   const formData = new FormData();
 
+  if (data?.id) {
+    formData.append("id", data.id);
+  }
 
   // Append text fields to formData
   formData.append("title", data.title);
   formData.append("description", data.description);
   formData.append("date", data.date);
+  formData.append("type", "minutes");
 
   // Append the selected image to formData
   if (document?.file) {
@@ -79,22 +83,15 @@ const submitMinute = async (id, data, document, mode) => {
     formData.append("existing_document", data.document);
   }
 
-  if (mode === formModeEnum.UPDATE) {
-    formData.append("id", id);
-  }
-
-  let response;
-  if (mode === formModeEnum.CREATE) {
-    response = await axios.post(`${process.env.REACT_APP_API}/minutes`, formData, {
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API}/minutes`, formData, {
       headers: { "Content-Type": "multipart/form-data" }
     });
-  } else if (mode === formModeEnum.UPDATE) {
-    response = await axios.put(`${process.env.REACT_APP_API}/minutes/${id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" }
-    });
-  }
+    toast.success(`Minute ${data?.id ? 'updated' : 'created'} successfully`);
+    return response.data;
+  } catch (error) {
 
-  return response.data;
+  }
 };
 
 const submitMember = async (data, image) => {
@@ -246,6 +243,16 @@ const deleteEvent = async (id) => {
   }
 }
 
+const deleteMinute = async (id) => {
+  try {
+    const response = await axios.delete(`${process.env.REACT_APP_API}/minutes/${id}`);
+    toast.success(`Minute deleted successfully`);
+    return response.data;
+  } catch (error) {
+    toast.error(`Error deleting minute`);
+  }
+}
+
 
 
 
@@ -269,4 +276,5 @@ export {
   deleteMember,
   deleteArticle,
   deleteEvent,
+  deleteMinute
 }
