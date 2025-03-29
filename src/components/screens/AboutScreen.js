@@ -6,7 +6,7 @@ const AboutScreen = () => {
 
   const aboutSection = (title, description, image, flip, link) => {
     return (
-      <div className="w-full flex sm:gap-16 gap-4 flex-col sm:flex-row">
+      <div className="w-full flex sm:gap-16 gap-12 flex-col sm:flex-row">
         <div className={`flex-2 md:pt-8  ${flip ? 'order-2' : 'order-1'} w-full`}>
           <h2 className="font-lora text-2xl">{title}</h2>
           <p>{description}</p>
@@ -34,47 +34,60 @@ const AboutScreen = () => {
       <div className="flex flex-col gap-8">
         {aboutSection(
           "PNS at a Glance",
-          "Our mission is to provide the best service to our customers.",
+          "Learn about our organization's history, mission, and vision for serving the Nepalese community in Peterborough.",
           `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-669986.jpeg`,
           false,
           `${process.env.REACT_APP_HOST}/assets/media/docs/about/PNS_glance.pdf`
         )}
         {aboutSection(
           "Constitution",
-          "Our mission is to provide the best service to our customers.",
+          "Our governing document that outlines the rules, principles, and framework under which PNS operates.",
           `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-2104882.jpeg`,
           false,
           `${process.env.REACT_APP_HOST}/assets/media/docs/about/constitution.pdf`
         )}
         {aboutSection(
           "PNS Property Acquisition Proposal",
-          "Our mission is to provide the best service to our customers.",
+          "Details of our initiative to acquire property for community use and development.",
           `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-1370704.jpeg`,
           true,
           `${process.env.REACT_APP_HOST}/assets/media/docs/about/PNS_Property_Acquisition_Proposal.pdf`
         )}
         {aboutSection(
           "Donation Fund Collection Policy",
-          "Our mission is to provide the best service to our customers.",
+          "Guidelines and procedures for transparent and accountable collection and management of donations.",
           `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-5942584.jpeg`,
           true,
           `${process.env.REACT_APP_HOST}/assets/media/docs/about/Donation_Fund_Collection_Policy.pdf`
         )}
         {aboutSection(
           "PNS Safeguarding Policy",
-          "Our mission is to provide the best service to our customers.",
+          "Our commitment to ensuring the safety and well-being of all community members, particularly vulnerable individuals.",
           `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-609771.jpeg`,
           false,
           `${process.env.REACT_APP_HOST}/assets/media/docs/about/PNS_Safeguarding_Policy.pdf`
         )}
         {aboutSection(
           "Health and Safety Policy",
-          "Our mission is to provide the best service to our customers.",
+          "Protocols and guidelines to ensure safe environments during all PNS events and activities.",
           `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-669986.jpeg`,
           false,
           `${process.env.REACT_APP_HOST}/assets/media/docs/about/Health_and_Safety_Policy.pdf`
         )}
-
+        {aboutSection(
+          "PNS Fundraising Policy",
+          "Standards and procedures for ethical fundraising activities to support our community initiatives.",
+          `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-6348119.jpeg`,
+          true,
+          `${process.env.REACT_APP_HOST}/assets/media/docs/about/PNS_UK_fundraising-policy_revised1.pdf`
+        )}
+        {aboutSection(
+          "Data Protection Policy",
+          "Our commitment to protecting personal data and maintaining privacy in accordance with GDPR regulations.",
+          `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-357514.jpeg`,
+          true,
+          `${process.env.REACT_APP_HOST}/assets/media/docs/about/PNS_GDPR.v3.pdf`
+        )}
       </div>
     </div>
   )
