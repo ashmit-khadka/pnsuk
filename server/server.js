@@ -704,7 +704,27 @@ app.get('/migrate', async (req, res) => {
       id: uuidv4(),
       username: 'admin',
       password: 'admin',
-    }
+    },
+    {
+      id: uuidv4(),
+      username: 'karkik',
+      password: 'Society@71',
+    },
+    {
+      id: uuidv4(),
+      username: 'khatiwadak',
+      password: 'Society@72',
+    },
+    {
+      id: uuidv4(),
+      username: 'sedhainn',
+      password: 'Society@73',
+    },
+    {
+      id: uuidv4(),
+      username: 'adhikarim',
+      password: 'Society@74',
+    },
   ]
 
   const data = {
