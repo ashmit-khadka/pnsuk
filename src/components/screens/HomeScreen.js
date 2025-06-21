@@ -72,7 +72,9 @@ const HomeScreen = () => {
           <p>The Peterborough Nepalese Society (PNS) is a non-profit making community based organisation established in 2007 with the initiation of all individuals or families originally coming from Nepal and those who are living in and around Peterborough areas.</p>
           <div className="flex flex-col gap-2" >
             <Button onClick={() => navigate('about')}> Learn more</Button>
-            <Button onClick={() => navigate('soon')}> Book Westwood Hall</Button>
+            <Button onClick={() => window.location.href = 'https://bookevent.pnsuk.org/'}>
+              Book Westwood Hall
+            </Button>
           </div>
           {/* <IconArrow style={{
             width: '13rem',
