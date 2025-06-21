@@ -22,6 +22,7 @@ import { LoginProvider } from './LoginContext';
 import { BrowserRouter } from 'react-router';
 import SoonScreen from './components/screens/SoonScreen';
 import GalleryScreen from './components/screens/GalleryScreen';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
       <LoginProvider>
         <div className='flex flex-col items-center pt-24'>
         <ToastContainer />
+          <ScrollToTop />
           <Navigation />
           <div className='px-4 md:px-0 w-full flex flex-col items-center'>
             <Routes>
