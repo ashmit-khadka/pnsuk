@@ -40,7 +40,14 @@ const AboutScreen = () => {
           `${process.env.REACT_APP_HOST}/assets/media/docs/about/PNS_glance.pdf`
         )}
         {aboutSection(
-          "Constitution",
+          "Constitution (New Amended)",
+          "Vew our latest governing document that outlines the rules, principles, and framework under which PNS operates.",
+          `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-2104882.jpeg`,
+          false,
+          `${process.env.REACT_APP_HOST}/assets/media/docs/about/constitution_amended.pdf`
+        )}
+        {aboutSection(
+          "Constitution (Old Version)",
           "Our governing document that outlines the rules, principles, and framework under which PNS operates.",
           `${process.env.REACT_APP_HOST}/assets/media/images/about/pexels-photo-2104882.jpeg`,
           false,
