@@ -40,7 +40,7 @@ const CommitteeScreen = () => {
           <p>{description}</p>
         </div>
       </div>
-      <div className="max-w-page w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="max-w-page w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {people.map(person => (
           <Member
             key={person.id}
@@ -70,8 +70,8 @@ const CommitteeScreen = () => {
         committee.management,
       )}
       {section(
-        'Advisors',
-        'Our advisors are experts in their field and provide valuable advice and guidance to the organisation. They help us to make informed decisions and ensure that we are working towards our goals.',
+        'Adviser',
+        'Our advisers are experts in their field and provide valuable advice and guidance to the organisation. They help us to make informed decisions and ensure that we are working towards our goals.',
         committee.advisors,
       )}
       {section(
@@ -85,7 +85,7 @@ const CommitteeScreen = () => {
         committee.members,
       )}
       {section(
-        'Volenuteers',
+        'Volunteers',
         'Our volunteers are the backbone of the organisation. They are the people who give up their time and energy to help us achieve our goals. Our volunteers are involved in all aspects of the organisation, from event planning to fundraising.',
         committee.volunteers,
       )}

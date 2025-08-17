@@ -28,8 +28,9 @@ const Layout = () => (
     <ScrollRestoration />
     <div className="px-4 md:px-0 w-full flex flex-col items-center">
       <Outlet /> {/* This renders the child routes */}
-      <Footer />
     </div>
+    <Footer />
+
   </div>
 );
 

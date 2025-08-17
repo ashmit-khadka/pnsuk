@@ -26,7 +26,7 @@ const ArticleScreen = (props) => {
   }, [id]);
 
   return (
-    <div className="w-full max-w-page px-4">
+    <div className="w-full max-w-page">
       <Breadcrumbs
         Items={[
           { href: '/', text: 'Home' },
@@ -69,7 +69,7 @@ const ArticleScreen = (props) => {
       </div>
       <div>
         <h2 className="mt-16 mb-4 font-lora">Related Articles</h2>
-        <div className="grid grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
           {articleSuggestions?.map((article) => (
             <Article
               key={article.id}
