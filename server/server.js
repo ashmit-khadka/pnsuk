@@ -864,8 +864,8 @@ if (process.env.NODE_ENV === 'development') {
   });
 } else {
   const options = {
-    key: fs.readFileSync(path.join(__dirname, 'server.key')),
-    cert: fs.readFileSync(path.join(__dirname, 'server.cer'))
+    key: fs.readFileSync('/etc/letsencrypt/live/pnsuk.org/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/pnsuk.org/fullchain.pem')
   };
 
   // Create HTTPS server
