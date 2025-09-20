@@ -86,7 +86,7 @@ const List = ({ elementType = 'minute' }) => {
               name: <div className="font-bold">{member.name}</div>,
               image: <img 
                 className="w-16 h-16 object-cover rounded-full"
-                src={`${process.env.REACT_APP_HOST}/assets/media/images/committee/${member.image}`} 
+                src={member.image} 
                 alt={member.name}
               />,
               position: member.position,

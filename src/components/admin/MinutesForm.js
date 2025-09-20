@@ -116,7 +116,7 @@ const MinutesForm = (props) => {
         />
       </div>
       <div className="flex justify-end gap-4">
-        <Button variant="default" type="submit" disabled={!isDirty}>Save</Button>
+        <Button variant="default" type="submit" >Save</Button>
         <Button variant="default" type="button" onClick={() => navigate(-1)}>Cancel</Button>
         {
           isEditMode &&

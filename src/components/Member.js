@@ -5,8 +5,8 @@ const Member = (props) => {
   return (
     <div className="member-card flex flex-col items-center">
       <img 
-        className={`member-image ${ imageSize === 'large' ? 'w-48 h-48' : 'w-32 h-32' } rounded-full object-cover mb-3 object-cover`}
-        src={`${process.env.REACT_APP_HOST}/assets/media/images/committee/${image}`} 
+        className={`member-image ${ imageSize === 'large' ? 'w-48 h-48' : 'w-32 h-32' } rounded-full object-cover mb-3`}
+        src={image} 
         alt={name} />
       <p className="font-bold text-lg m-0">{name}</p>
       <p className='font-medium'>{position}</p>

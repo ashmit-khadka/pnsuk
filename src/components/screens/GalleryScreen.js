@@ -25,7 +25,7 @@ const GalleryScreen = () => {
             const response = await getAllArticles();
             setArticles(response);
             const images = response.flatMap(article => article.images.map(image => ({
-                src: `${process.env.REACT_APP_HOST}/assets/media/images/articles/${image.image}`,
+                src: image.image,
                 alt: article.title
             })));
             setAllImages(images);

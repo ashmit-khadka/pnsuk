@@ -10,40 +10,113 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
+const AWS = require('aws-sdk');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 
 const defaultEvents = require('./backup/defaults/events.json');
 //const defaultArticles = require('./backup/defaults/articles.json');
 
-const minutesPath = 'assets/media/docs/minutes/';
-
-// Set up storage with Multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let path
-    switch (req?.body?.type) {
-      case 'article':
-        path = 'public/assets/media/images/articles/';
-        break;
-      case 'committee':
-        path = 'public/assets/media/images/committee/';
-        break;
-      case 'image':
-        path = 'public/assets/media/member_imgs/';
-        break;
-        case 'minutes':
-          path = `public/${minutesPath}`;
-          break;
-    }
-    cb(null, path); // Set upload folder
-  },
-  filename: (req, file, cb) => {
-    // file name should be unique, use uuidv4 and use original file extension
-    cb(null, `${uuidv4()}${file.originalname.substring(file.originalname.lastIndexOf('.'))}`);
-  }
+// Configure AWS S3
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
 });
 
-const upload = multer({ storage });
+const s3 = new AWS.S3();
+const bucketName = process.env.S3_BUCKET_NAME;
+const environment = process.env.NODE_ENV || 'development';
+
+// Helper function to upload file to S3
+const uploadToS3 = async (file, objectType) => {
+  const envFolder = environment === 'production' ? 'prod' : 'dev';
+  const fileName = `prod/assets/${objectType}/${uuidv4()}-${file.originalname}`;
+  
+  const uploadParams = {
+    Bucket: bucketName,
+    Key: fileName,
+    Body: file.buffer, // Use buffer for memory storage
+    ContentType: file.mimetype
+  };
+
+  console.log('Uploading to S3:', fileName);
+  const result = await s3.upload(uploadParams).promise();
+  
+  return {
+    s3Url: result.Location,
+    s3Key: result.Key,
+    fileName: fileName
+  };
+};
+
+// Helper function to convert S3 key to full URL
+const getS3Url = (type, s3Key) => {
+  if (!s3Key) return null;
+  if (s3Key.startsWith('http')) return s3Key; // Already a full URL
+  
+  // Special handling for member images - redirect to S3 committee folder with correct path
+  if (type === 'member' && s3Key) {
+    // Extract just the filename from the S3 key
+    const fileName = s3Key.split('/').pop();
+    return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/images/committee/${fileName}`;
+  }
+
+  if (type === 'article' && s3Key) {
+  
+    const fileName = s3Key.split('/').pop();
+    return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/images/articles/${fileName}`;
+  }
+
+  if (type === 'minute' && s3Key) {
+    const fileName = s3Key.split('/').pop();
+    return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/docs/minutes/${fileName}`;
+  }
+
+  // For articles and minutes, use the regular S3 path
+  return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+};
+
+// Helper function to delete file from S3
+const deleteFromS3 = async (s3Key) => {
+  if (!s3Key) return;
+  
+  const deleteParams = {
+    Bucket: bucketName,
+    Key: s3Key
+  };
+  
+  try {
+    await s3.deleteObject(deleteParams).promise();
+    console.log('Deleted from S3:', s3Key);
+  } catch (error) {
+    console.error('Error deleting from S3:', error);
+  }
+};
+
+console.log('AWS Configuration:');
+console.log('Access Key ID:', process.env.AWS_ACCESS_KEY_ID ? 'Set' : 'Not set');
+console.log('Secret Access Key:', process.env.AWS_SECRET_ACCESS_KEY ? 'Set' : 'Not set');
+console.log('Region:', process.env.AWS_REGION);
+console.log('Bucket Name:', bucketName);
+
+// Validate required environment variables
+if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !process.env.AWS_REGION || !bucketName) {
+  console.error('Missing required AWS environment variables. Please check your .env file.');
+  console.error('Required variables: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, S3_BUCKET_NAME');
+}
+
+const minutesPath = 'assets/media/docs/minutes/';
+
+// Set up storage with Multer - using memory storage for S3 uploads
+const storage = multer.memoryStorage();
+
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  }
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -116,9 +189,13 @@ const getArticles = async () => {
     });
   });
 
-  // Combine articles and images
+  // Combine articles and images with proper S3 URLs
   const articlesWithImages = articles.map(article => {
-    article.images = images.filter(image => image.article === article.id) || [];
+    const articleImages = images.filter(image => image.article === article.id) || [];
+    article.images = articleImages.map(img => ({
+      ...img,
+      image: getS3Url('article', img.image) // Add full S3 URL
+    }));
     return article;
   });
 
@@ -159,9 +236,10 @@ const creatArticle = async (article) => {
   db.serialize(() => {
     db.run('INSERT INTO articles (id, title, date, text, is_event, is_aid, is_guest, is_project, is_home, is_sport) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);', [articleId, article.title, article.date, article.text, article.is_event, article.is_aid, article.is_guest, article.is_project, article.is_home, article.is_sport]);
 
-    article.images.new.forEach((image) => {
+    // Store S3 paths in database
+    article.images.new.forEach((s3Result) => {
       const imageId = uuidv4();
-      db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, articleId, image.filename]);
+      db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, articleId, s3Result.fileName]);
     });
   });
 
@@ -177,13 +255,16 @@ const updateArticle = async (article) => {
   db.serialize(() => {
     db.run('DELETE FROM article_images WHERE article = ?;', [article.id]);
 
-    article.images.new.forEach((image) => {
+    // Store new S3 image paths
+    article.images.new.forEach((s3Result) => {
       const imageId = uuidv4();
-      db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, article.id, image.filename]);
+      db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, article.id, s3Result.fileName]);
     });
-    article.images.old.forEach((image) => {
+    
+    // Keep existing images (these are already S3 paths)
+    article.images.old.forEach((imagePath) => {
       const imageId = uuidv4();
-      db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, article.id, image]);
+      db.run('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', [imageId, article.id, imagePath]);
     });
   });
 
@@ -213,35 +294,46 @@ app.get('/article/:id', async (req, res) => {
 });
 
 app.post("/article", upload.array("images", 10), async (req, res) => {
+  try {
 
-  if (!req.files) {
-    return res.status(400).send("No files were uploaded.");
+    // Upload all images to S3
+    const uploadPromises = req.files.map(file => uploadToS3(file, 'media/images/articles'));
+    const s3Results = await Promise.all(uploadPromises);
+
+    const newArticle = {
+      id: req.body.id,
+      title: req.body.title,
+      text: req.body.text,
+      date: req.body.date,
+      is_event: convertToBoolean(req.body.is_event),
+      is_aid: convertToBoolean(req.body.is_aid),
+      is_guest: convertToBoolean(req.body.is_guest),
+      is_project: convertToBoolean(req.body.is_project),
+      is_home: convertToBoolean(req.body.is_home),
+      is_sport: convertToBoolean(req.body.is_sport),
+      images: { 
+        new: s3Results, 
+        old: req.body.existing_images ? req.body.existing_images : []
+      },
+    };
+
+    let articleId = newArticle?.id;
+    if (articleId) {
+      articleId = await updateArticle(newArticle);
+    } else {
+      articleId = await creatArticle(newArticle);
+    }
+
+    const article = await getArticleById(articleId);
+    res.json(article);
+    
+  } catch (error) {
+    console.error('Article upload error:', error);
+    res.status(500).json({ 
+      error: 'Article upload failed', 
+      details: error.message 
+    });
   }
-
-  const newArticle = {
-    id: req.body.id,
-    title: req.body.title,
-    text: req.body.text,
-    date: req.body.date,
-    is_event: convertToBoolean(req.body.is_event),
-    is_aid: convertToBoolean(req.body.is_aid),
-    is_guest: convertToBoolean(req.body.is_guest),
-    is_project: convertToBoolean(req.body.is_project),
-    is_home: convertToBoolean(req.body.is_home),
-    is_sport: convertToBoolean(req.body.is_sport),
-    images: { new: req.files, old: req.body.existing_images },
-  };
-
-  let articleId = newArticle?.id
-  if (articleId) {
-    articleId = await updateArticle(newArticle);
-  } else {
-    articleId = await creatArticle(newArticle);
-  }
-
-  const article = await getArticleById(articleId);
-
-  res.json(article);
 });
 
 
@@ -262,13 +354,27 @@ app.put('/article/:id', (req, res) => {
   res.status(200).send('Article updated');
 });
 
-app.delete('/article/:id', (req, res) => {
-  db.serialize(() => {
-    db.run('DELETE FROM articles WHERE id = ?;', [req.params.id]);
-    db.run('DELETE FROM article_images WHERE article = ?;', [req.params.id]);
-  });
+app.delete('/article/:id', async (req, res) => {
+  try {
+    // Get article images to delete from S3
+    const images = await dbAllAsync('SELECT * FROM article_images WHERE article = ?;', db, [req.params.id]);
+    
+    // Delete images from S3
+    for (const image of images) {
+      await deleteFromS3(image.image);
+    }
+    
+    // Delete from database
+    db.serialize(() => {
+      db.run('DELETE FROM articles WHERE id = ?;', [req.params.id]);
+      db.run('DELETE FROM article_images WHERE article = ?;', [req.params.id]);
+    });
 
-  res.status(200).send('Article deleted');
+    res.status(200).send('Article deleted');
+  } catch (error) {
+    console.error('Error deleting article:', error);
+    res.status(500).json({ error: 'Failed to delete article', details: error.message });
+  }
 });
 
 app.put('/articles/clear', (req, res) => {
@@ -332,10 +438,29 @@ const updateMember = async (member) => {
 };
 
 
-const deleteMember = (id) => {
-  db.serialize(() => {
-    db.run('DELETE FROM members WHERE id = ?;', [id]);
-  });
+const deleteMember = async (id) => {
+  try {
+    // Get member to find image S3 key for deletion
+    const member = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM members WHERE id = ?;', [id], (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    });
+    
+    // Delete image from S3 if it exists
+    if (member && member.image) {
+      await deleteFromS3(member.image);
+    }
+    
+    // Delete from database
+    db.serialize(() => {
+      db.run('DELETE FROM members WHERE id = ?;', [id]);
+    });
+  } catch (error) {
+    console.error('Error deleting member:', error);
+    throw error;
+  }
 }
 
 const getMember = async (id) => {
@@ -344,6 +469,9 @@ const getMember = async (id) => {
       if (err) {
         return reject(err);
       }
+      if (row) {
+        row.image = getS3Url('member', row.image);
+      }
       resolve(row);
     });
   });
@@ -351,7 +479,11 @@ const getMember = async (id) => {
 
 const getMembers = async () => {
   const members = await dbAllAsync('SELECT * FROM members;', db);
-  return members;
+  // Add S3 URLs to member images
+  return members.map(member => ({
+    ...member,
+    image: getS3Url("member", member.image)
+  }));
 }
 
 app.get('/members', (req, res) => {
@@ -366,38 +498,73 @@ app.get('/members', (req, res) => {
 });
 
 app.post("/member", upload.single("image"), async (req, res) => {
-  const member = {
-    id: req.body?.id,
-    name: req.body?.name,
-    image: req?.file?.filename || req?.body?.existing_image,
-    position: req.body?.position,
-    role: req.body?.role,
-    order: req.body?.order,
-  };
+  try {
+    let imageS3Path = req?.body?.existing_image; // Keep existing image if no new one uploaded
+    
+    // Upload new image to S3 if provided
+    if (req.file) {
+      const s3Result = await uploadToS3(req.file, 'media/images/committee');
+      imageS3Path = s3Result.fileName; // Store the S3 key/path in database
+    }
 
-  if (member?.id) {
-    await updateMember(member);
-  } else {
-    const newMemberId = await creatMember(member);
-    member.id = newMemberId;
+    const member = {
+      id: req.body?.id,
+      name: req.body?.name,
+      image: imageS3Path, // This will be the S3 key stored in database
+      position: req.body?.position,
+      role: req.body?.role,
+      order: req.body?.order,
+    };
+
+    if (member?.id) {
+      await updateMember(member);
+    } else {
+      const newMemberId = await creatMember(member);
+      member.id = newMemberId;
+    }
+
+    const memberResponse = await getMember(member?.id);
+    res.json(memberResponse);
+    
+  } catch (error) {
+    console.error('Member upload error:', error);
+    res.status(500).json({ 
+      error: 'Member upload failed', 
+      details: error.message 
+    });
   }
-
-  const memberResponse = await getMember(member?.id);
-  res.json(memberResponse);
 });
 
 app.put("/member/:id", upload.single("image"), async (req, res) => {
-  const member = {
-    id: req.body?.id,
-    name: req.body?.name,
-    image: req.file?.filename || '',
-    position: req.body?.position,
-    order: req.body?.order,
-  };
+  try {
+    let imageS3Path = req?.body?.existing_image; // Keep existing image if no new one uploaded
+    
+    // Upload new image to S3 if provided
+    if (req.file) {
+      const s3Result = await uploadToS3(req.file, 'media/images/committee');
+      imageS3Path = s3Result.fileName; // Store the S3 key/path in database
+    }
 
-  const updatedMember = await updateMember(member);
+    const member = {
+      id: req.body?.id,
+      name: req.body?.name,
+      image: imageS3Path, // This will be the S3 key stored in database
+      position: req.body?.position,
+      role: req.body?.role,
+      order: req.body?.order,
+    };
 
-  res.json(updatedMember);
+    const updatedMember = await updateMember(member);
+    const memberResponse = await getMember(member?.id);
+    res.json(memberResponse);
+    
+  } catch (error) {
+    console.error('Member update error:', error);
+    res.status(500).json({ 
+      error: 'Member update failed', 
+      details: error.message 
+    });
+  }
 });
 
 
@@ -409,6 +576,101 @@ app.delete('/member/:id', async (req, res) => {
 app.get('/member/:id', async (req, res) => {
   const member = await getMember(req.params.id);
   res.json(member);
+});
+
+// S3 Test Upload Route
+app.post('/member_test', upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Check if AWS is properly configured
+    if (!bucketName || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+      return res.status(500).json({ 
+        error: 'AWS S3 not properly configured', 
+        details: 'Missing environment variables for AWS S3 access' 
+      });
+    }
+
+    // Upload to S3 using the helper function
+    const s3Result = await uploadToS3(req.file, 'test');
+
+    // Store test upload info in database
+    const testUploadId = uuidv4();
+    const testUpload = {
+      id: testUploadId,
+      fileName: req.file.originalname,
+      s3Url: s3Result.s3Url,
+      s3Key: s3Result.s3Key,
+      uploadedAt: new Date().toISOString(),
+      testData: req.body.testData || null
+    };
+
+    db.run(
+      'INSERT INTO test_uploads (id, file_name, s3_url, s3_key, uploaded_at, test_data) VALUES (?, ?, ?, ?, ?, ?)',
+      [testUpload.id, testUpload.fileName, testUpload.s3Url, testUpload.s3Key, testUpload.uploadedAt, testUpload.testData],
+      function(err) {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Database error', details: err.message });
+        }
+        
+        res.json({
+          success: true,
+          upload: testUpload,
+          message: 'File uploaded to S3 and record stored in database'
+        });
+      }
+    );
+
+  } catch (error) {
+    console.error('S3 upload error:', error);
+    
+    res.status(500).json({ 
+      error: 'Upload failed', 
+      details: error.message 
+    });
+  }
+});
+
+// Get all test uploads
+app.get('/member_test', async (req, res) => {
+  try {
+    const testUploads = await dbAllAsync('SELECT * FROM test_uploads ORDER BY uploaded_at DESC;', db);
+    res.json(testUploads);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
+// Delete test upload
+app.delete('/member_test/:id', async (req, res) => {
+  try {
+    // Get upload info first
+    const upload = await dbAllAsync('SELECT * FROM test_uploads WHERE id = ?;', db, [req.params.id]);
+    
+    if (upload.length === 0) {
+      return res.status(404).json({ error: 'Upload not found' });
+    }
+
+    // Delete from S3
+    const deleteParams = {
+      Bucket: bucketName,
+      Key: upload[0].s3_key
+    };
+
+    await s3.deleteObject(deleteParams).promise();
+
+    // Delete from database
+    await dbRunAsync('DELETE FROM test_uploads WHERE id = ?;', db, [req.params.id]);
+    
+    res.json({ success: true, message: 'Test upload deleted from S3 and database' });
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ error: 'Delete failed', details: error.message });
+  }
 });
 
 
@@ -441,7 +703,13 @@ const updateMinutes = (minutes) => {
   return minutes.id;
 };
 
-const deleteMinutes = (id) => {
+const deleteMinutes = async (id) => {
+  // Get minute to find file path
+  const minute = await getMinute(id);
+  if (minute && minute.file) {
+    await deleteFromS3(minute.file);
+  }
+  
   db.serialize(() => {
     db.run('DELETE FROM minutes WHERE id = ?;', [id]);
   });
@@ -449,8 +717,10 @@ const deleteMinutes = (id) => {
 
 const getMinute = async (id) => {
   const minute = (await dbAllAsync('SELECT * FROM minutes WHERE id = ?;', db, [id]))[0];
-  // add file path to minute object.
-  minute.filePath = `${minutesPath}${minute.file}`;
+  // The file field now contains the S3 path, so we can construct the full S3 URL
+  if (minute && minute.file) {
+    minute.filePath = getS3Url('minute', minute.file);
+  }
   return minute;
 }
 
@@ -462,6 +732,7 @@ const getMinutes = async (id) => {
 app.get('/minute/:id', (req, res) => {
   getMinute(req.params.id)
     .then(minute => {
+      minute.fileUrl = getS3Url('minute', minute.file);
       res.json(minute);
     })
     .catch(err => {
@@ -473,6 +744,9 @@ app.get('/minute/:id', (req, res) => {
 app.get('/minutes', (req, res) => {
   getMinutes()
     .then(minutes => {
+      minutes.forEach(minute => {
+        minute.fileUrl = getS3Url('minute', minute.file);
+      });
       res.json(minutes);
     })
     .catch(err => {
@@ -482,25 +756,41 @@ app.get('/minutes', (req, res) => {
 });
 
 app.post('/minutes', upload.single("document"), async (req, res) => {
-  const minutes = req.body;
+  try {
+    const minutes = req.body;
+    let fileS3Path = req?.body?.existing_document;
 
-  const minute = {
-    id: minutes.id,
-    title: minutes.title,
-    description: minutes.description,
-    date: minutes.date,
-    file: req?.file?.filename || req?.body?.existing_document,
+    // Upload new document to S3 if provided
+    if (req.file) {
+      const s3Result = await uploadToS3(req.file, 'media/docs/minutes');
+      fileS3Path = s3Result.fileName;
+    }
+
+    const minute = {
+      id: minutes.id,
+      title: minutes.title,
+      description: minutes.description,
+      date: minutes.date,
+      file: fileS3Path,
+    };
+
+    if (minute?.id) {
+      await updateMinutes(minute);
+    } else {
+      const newMinuteId = await createMinutes(minute);
+      minute.id = newMinuteId;
+    }
+
+    const minuteResponse = await getMinute(minute.id);
+    res.json(minuteResponse);
+    
+  } catch (error) {
+    console.error('Minutes upload error:', error);
+    res.status(500).json({ 
+      error: 'Minutes upload failed', 
+      details: error.message 
+    });
   }
-
-  if (minute?.id) {
-    await updateMinutes(minute);
-  } else {
-    const newMinuteId = await createMinutes(minute);
-    minute.id = newMinuteId;
-  }
-
-  const minuteResponse = await getMinute(minute.id);
-  res.json(minuteResponse);
 });
 
 app.put('/minutes/:id', upload.single("document"), async (req, res) => {
@@ -535,8 +825,9 @@ app.get('/reset', (req, res) => {
     // create tables
     db.run('CREATE TABLE articles (id TEXT PRIMARY KEY, title TEXT, date TEXT, text TEXT, is_event INTEGER, is_aid INTEGER, is_guest INTEGER, is_project INTEGER, is_home INTEGER, is_sport INTEGER);');
     db.run('CREATE TABLE article_images (id TEXT PRIMARY KEY, article TEXT, image TEXT);');
-    db.run('CREATE TABLE members (id TEXT PRIMARY KEY, name TEXT, image TEXT, position TEXT, "order" INTEGER);');
-    db.run('CREATE TABLE minutes (id TEXT PRIMARY KEY, file TEXT, date TEXT, description TEXT, "order" INTEGER);');
+    db.run('CREATE TABLE members (id TEXT PRIMARY KEY, name TEXT, image TEXT, position TEXT, role TEXT, "order" INTEGER);');
+    db.run('CREATE TABLE minutes (id TEXT PRIMARY KEY, title TEXT, file TEXT, date TEXT, description TEXT, "order" INTEGER);');
+    db.run('CREATE TABLE test_uploads (id TEXT PRIMARY KEY, file_name TEXT, s3_url TEXT, s3_key TEXT, uploaded_at TEXT, test_data TEXT);');
 
     // insert default data
     db.run('INSERT INTO members (id, name, image, position, "order") VALUES (?, ?, ?, ?, ?);', [uuidv4(), 'John Doe', 'john-doe.jpg', 'CEO', 1]);
@@ -740,29 +1031,41 @@ app.get('/migrate', async (req, res) => {
   await dbRunAsync('CREATE TABLE minutes (id TEXT PRIMARY KEY, "title" TEXT, file TEXT, description TEXT, date TEXT);', db);
   await dbRunAsync('CREATE TABLE events (id TEXT PRIMARY KEY, title TEXT, description TEXT, timestamp TEXT, "location" TEXT, "contact" TEXT, recurring TEXT);', db);
   await dbRunAsync('CREATE TABLE login (id TEXT PRIMARY KEY, username TEXT, password TEXT);', db);
+  await dbRunAsync('CREATE TABLE test_uploads (id TEXT PRIMARY KEY, file_name TEXT, s3_url TEXT, s3_key TEXT, uploaded_at TEXT, test_data TEXT);', db);
 
   articles.forEach(async article => {
     const articleId = uuidv4();
     // convert article.date to timestamp
     article.date = new Date(article.date).toISOString();
 
-    // if image begins with 'article_imgs/' remove it
-    const formatedImage = article.image.split('article_imgs/').join('');
+    // Convert old local image paths to new S3 structure
+    let s3ImagePath = article.image;
+    if (article.image && !article.image.startsWith('http')) {
+      const formatedImage = article.image.split('article_imgs/').join('');
+      s3ImagePath = `${environment === 'production' ? 'prod' : 'dev'}/media/article/${formatedImage}`;
+    }
 
     await dbRunAsync('INSERT INTO articles (id, title, date, text, is_event, is_aid, is_guest, is_project, is_home, is_sport) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);', db, [articleId, article.title, article.date, article.text, article.event, article.aid, article.guest, article.project, article.home, article.sport]);
-    await dbRunAsync('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', db, [uuidv4(), articleId, formatedImage]);
+    await dbRunAsync('INSERT INTO article_images (id, article, image) VALUES (?, ?, ?);', db, [uuidv4(), articleId, s3ImagePath]);
   });
 
   members.forEach(async member => {
     const memberId = uuidv4();
-    const formatedImage = member.image.split('member_imgs/').join('');
+    // Image paths are now S3 paths - update accordingly
+    let s3ImagePath = member.image;
+    if (member.image && !member.image.startsWith('http')) {
+      // Convert old local paths to new S3 structure if needed
+      const formatedImage = member.image.split('member_imgs/').join('');
+      s3ImagePath = `${environment === 'production' ? 'prod' : 'dev'}/media/member/${formatedImage}`;
+    }
+    
     let role
     if (member.position === 'Trustee' || member.position === 'Advisor' || member.position === 'Member' || member.position === 'Volunteer') {
       role = member.position;
     } else {
       role = 'Management';
     }
-    await dbRunAsync('INSERT INTO members (id, name, image, role, position, "order") VALUES (?, ?, ?, ?, ?, ?);', db, [memberId, member.name, formatedImage, role, member.position, member.order]);
+    await dbRunAsync('INSERT INTO members (id, name, image, role, position, "order") VALUES (?, ?, ?, ?, ?, ?);', db, [memberId, member.name, s3ImagePath, role, member.position, member.order]);
   });
 
 
@@ -773,9 +1076,14 @@ app.get('/migrate', async (req, res) => {
 
   minutes.forEach(async minute => {
     const minuteId = uuidv4();
-    const formatedFile = minute.file.split('minute_docs/').join('');
+    // Convert old local file paths to new S3 structure
+    let s3FilePath = minute.file;
+    if (minute.file && !minute.file.startsWith('http')) {
+      const formatedFile = minute.file.split('minute_docs/').join('');
+      s3FilePath = `${environment === 'production' ? 'prod' : 'dev'}/media/minute/${formatedFile}`;
+    }
     minute.date = new Date(minute.date).toISOString();
-    await dbRunAsync('INSERT INTO minutes (id, title, file, description, date) VALUES (?, ?, ?, ?, ?);', db, [minuteId, formatedFile, formatedFile, minute.description, minute.date]);
+    await dbRunAsync('INSERT INTO minutes (id, title, file, description, date) VALUES (?, ?, ?, ?, ?);', db, [minuteId, s3FilePath, s3FilePath, minute.description, minute.date]);
   });
 
   login.forEach(async user => {
@@ -804,7 +1112,8 @@ app.post('/login', async (req, res) => {
 const mapImagesToArticles = async (articles) => {
   const images = await dbAllAsync('SELECT * FROM article_images;', db);
   return articles.map(article => {
-    article.images = images.filter(image => image.article === article.id) || [];
+    const image = images.find(image => image.article === article.id);
+    article.images = [{ image: getS3Url('article', image.image || []) }];
     return article;
   });
 }
@@ -828,15 +1137,22 @@ app.get('/home', async (req, res) => {
   const memberCoordinator = await dbAllAsync('SELECT * FROM members WHERE position = "Coordinator" LIMIT 1;', db);
   const events = await dbAllAsync('SELECT * FROM events ORDER BY timestamp DESC LIMIT 3;', db);
 
+  // Add S3 URLs to member images
+  const addS3UrlToMembers = (members) => {
+    return members.map(member => ({
+      ...member,
+      image: getS3Url('member', member.image)
+    }));
+  };
 
   const data = {
     images: await mapImagesToArticles(images),
     donations: await mapImagesToArticles(donations),
     articles: await mapImagesToArticles(articles),
     members: {
-      president: memeberPresident[0],
-      vicePresident: memberVicePresident,
-      coordinator: memberCoordinator[0],
+      president: memeberPresident[0] ? { ...memeberPresident[0], image: getS3Url('member', memeberPresident[0].image) } : null,
+      vicePresident: addS3UrlToMembers(memberVicePresident),
+      coordinator: memberCoordinator[0] ? { ...memberCoordinator[0], image: getS3Url('member', memberCoordinator[0].image) } : null,
     },
     events
   }

@@ -12,6 +12,7 @@ import ArticleForm from './components/admin/ArticleForm';
 import MemberForm from './components/admin/MembersForm';
 import MinuteForm from './components/admin/MinutesForm';
 import EventForm from './components/admin/EventForm';
+import S3TestForm from './components/admin/S3TestForm';
 import AboutScreen from './components/screens/AboutScreen';
 import MinutesScreen from './components/screens/MinutesScreen';
 import EventsScreen from './components/screens/EventsScreen';
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
           { path: 'admin/member', element: <MemberForm /> },
           { path: 'admin/minute', element: <MinuteForm /> },
           { path: 'admin/event', element: <EventForm /> },
+          { path: 'admin/s3-test', element: <S3TestForm /> },
         ],
       },
     ],

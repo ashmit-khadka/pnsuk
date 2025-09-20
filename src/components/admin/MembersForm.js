@@ -37,14 +37,14 @@ const MemberForm = (props) => {
     });
     setSelectedImage({
       name: data.image,
-      preview: `${process.env.REACT_APP_HOST}/assets/media/images/committee/${data.image}`
+      preview: data.image
     })
   }
 
   const onSubmit = async (data) => {
     const response = await submitMember(data, selectedImage);
     //updateForm(response)
-    navigate('/admin/dashboard/members');
+    navigate('/admin/dashboard/committee');
   };
 
   const onDelete = async (id) => {
@@ -134,7 +134,7 @@ const MemberForm = (props) => {
         />
       </div>
       <div className="flex justify-end gap-4">
-        <Button variant="default" type="submit" disabled={!isDirty}>Save</Button>
+        <Button variant="default" type="submit" >Save</Button>
         <Button variant="default" type="button" onClick={() => navigate(-1)}>Cancel</Button>
         {
           isEditMode &&

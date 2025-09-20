@@ -32,7 +32,7 @@ const MinutesScreen = () => {
   };
 
   const onOpenMinute = (minute) => {
-    window.open(`${process.env.REACT_APP_HOST}/assets/media/docs/minutes/${minute.file}`, "_blank");
+    window.open(minute.fileUrl, "_blank");
   }
 
   const groupedMinutes = groupMinutesByMonth(minutes);
@@ -58,7 +58,7 @@ const MinutesScreen = () => {
             {groupedMinutes[month].map(minute => (
               <div key={minute.id} onClick={() => onOpenMinute(minute)} className="w-full flex flex-col cursor-pointer group font-raleway">
                 <div className="overflow-hidden">
-                  <img src={`${process.env.REACT_APP_HOST}/assets/media/images/defaults/minutes.jpg`} alt={minute.title} className="w-full w-full h-48 rounded-lg mb-2 object-cover transform transition-transform duration-300 group-hover:scale-110" />
+                  <img src={`${process.env.REACT_APP_HOST}/assets/media/images/defaults/minutes.jpg`} alt={minute.title} className="w-full h-48 rounded-lg mb-2 object-cover transform transition-transform duration-300 group-hover:scale-110" />
                 </div>
                 <h3 className="text-lg font-bold m-0 group-hover:underline">{minute.title}</h3>
                 <p>{moment(minute.date).format("MMMM Do YYYY")}</p>

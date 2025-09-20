@@ -52,7 +52,7 @@ const ArticleScreen = (props) => {
               <img
                 className="img-fluid"
                 key={image.id}
-                src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${image.image}`}
+                src={image.image}
                 alt={image.title}
               />
               {/* <Carousel.Caption>

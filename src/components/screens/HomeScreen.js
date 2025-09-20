@@ -92,7 +92,7 @@ const HomeScreen = () => {
           <Carousel>
             {data?.images?.map((article) =>
               <Carousel.Item className="" key={article.id}>
-                <img className="w-full h-96 object-cover" style={{ borderRadius: '2rem' }} key={article.id} src={`${process.env.REACT_APP_HOST}/assets/media/images/articles/${article.images[0].image}`} alt={article.title} />
+                <img className="w-full h-96 object-cover" style={{ borderRadius: '2rem' }} key={article.id} src={article.images[0].image} alt={article.title} />
 
               </Carousel.Item>
             )
