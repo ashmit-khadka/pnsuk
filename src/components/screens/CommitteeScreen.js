@@ -35,7 +35,8 @@ const CommitteeScreen = () => {
       })
   }, []);
 
-  const section = (title, description, people) => (
+const section = (title, description, people) => (
+  people.length === 0 ? null : (
     <div className="w-full mb-16 flex flex-col items-center">
       <div className="w-full bg-gradient-to-r from-themeDark to-themePrimary text-white p-12 relative mb-12 rounded-lg flex items-center justify-center">
         <div className="max-w-page">
@@ -54,7 +55,9 @@ const CommitteeScreen = () => {
         ))}
       </div>
     </div>
-  );
+  )
+);
+
 
   return (
     <div className="w-full flex flex-col items-center">
