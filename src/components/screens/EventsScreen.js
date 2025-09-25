@@ -105,16 +105,19 @@ const EventsScreen = () => {
       {sortedMonths.map(month => (
         <div className="mt-8" key={month}>
           <h2 className="font-lora mb-4">{month}</h2>
-          {groupedEvents[month].map(event => (
-            <Event
-              key={event.id}
-              title={event.title}
-              description={event.description}
-              location={event.location}
-              date={event.nextValidDate ? event.nextValidDate : "No upcoming date"}
-              contact={event.contact}
-            />
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+            {groupedEvents[month].map(event => (
+              <Event
+                key={event.id}
+                title={event.title}
+                description={event.description}
+                location={event.location}
+                date={event.nextValidDate ? event.nextValidDate : "No upcoming date"}
+                contact={event.contact}
+                image={event.image}
+              />
+            ))}
+          </div>
         </div>
       ))}
     </div>

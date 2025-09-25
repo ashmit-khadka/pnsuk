@@ -165,7 +165,7 @@ const submitArticle = async (data, images) => {
 };
 
 
-const submitEvent = async (data) => {
+const submitEvent = async (data, image) => {
   const formData = new FormData();
   
   data.timestamp = convertToISOFormat(data.timestamp);
@@ -181,10 +181,18 @@ const submitEvent = async (data) => {
   formData.append("location", data.location);
   formData.append("contact", data.contact);
   formData.append("recurring", data.recurring);
+  formData.append("type", "event");
+
+  // Append the selected image to formData
+  if (image?.file) {
+    formData.append("image", image.file);
+  } else {
+    formData.append("existing_image", data.image);
+  }
 
   try {
     const response = await axios.post(`${process.env.REACT_APP_API}/events`, formData, {
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "multipart/form-data" }
     });
     toast.success(`Event ${data?.id ? 'updated' : 'created'} successfully`);
     return response.data;

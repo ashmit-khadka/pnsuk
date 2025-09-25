@@ -73,6 +73,11 @@ const getS3Url = (type, s3Key) => {
     return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/docs/minutes/${fileName}`;
   }
 
+  if (type === 'event' && s3Key) {
+    const fileName = s3Key.split('/').pop();
+    return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/images/events/${fileName}`;
+  }
+
   // For articles and minutes, use the regular S3 path
   return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
 };
@@ -578,102 +583,6 @@ app.get('/member/:id', async (req, res) => {
   res.json(member);
 });
 
-// S3 Test Upload Route
-app.post('/member_test', upload.single("image"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-
-    // Check if AWS is properly configured
-    if (!bucketName || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
-      return res.status(500).json({ 
-        error: 'AWS S3 not properly configured', 
-        details: 'Missing environment variables for AWS S3 access' 
-      });
-    }
-
-    // Upload to S3 using the helper function
-    const s3Result = await uploadToS3(req.file, 'test');
-
-    // Store test upload info in database
-    const testUploadId = uuidv4();
-    const testUpload = {
-      id: testUploadId,
-      fileName: req.file.originalname,
-      s3Url: s3Result.s3Url,
-      s3Key: s3Result.s3Key,
-      uploadedAt: new Date().toISOString(),
-      testData: req.body.testData || null
-    };
-
-    db.run(
-      'INSERT INTO test_uploads (id, file_name, s3_url, s3_key, uploaded_at, test_data) VALUES (?, ?, ?, ?, ?, ?)',
-      [testUpload.id, testUpload.fileName, testUpload.s3Url, testUpload.s3Key, testUpload.uploadedAt, testUpload.testData],
-      function(err) {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({ error: 'Database error', details: err.message });
-        }
-        
-        res.json({
-          success: true,
-          upload: testUpload,
-          message: 'File uploaded to S3 and record stored in database'
-        });
-      }
-    );
-
-  } catch (error) {
-    console.error('S3 upload error:', error);
-    
-    res.status(500).json({ 
-      error: 'Upload failed', 
-      details: error.message 
-    });
-  }
-});
-
-// Get all test uploads
-app.get('/member_test', async (req, res) => {
-  try {
-    const testUploads = await dbAllAsync('SELECT * FROM test_uploads ORDER BY uploaded_at DESC;', db);
-    res.json(testUploads);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send(err.message);
-  }
-});
-
-// Delete test upload
-app.delete('/member_test/:id', async (req, res) => {
-  try {
-    // Get upload info first
-    const upload = await dbAllAsync('SELECT * FROM test_uploads WHERE id = ?;', db, [req.params.id]);
-    
-    if (upload.length === 0) {
-      return res.status(404).json({ error: 'Upload not found' });
-    }
-
-    // Delete from S3
-    const deleteParams = {
-      Bucket: bucketName,
-      Key: upload[0].s3_key
-    };
-
-    await s3.deleteObject(deleteParams).promise();
-
-    // Delete from database
-    await dbRunAsync('DELETE FROM test_uploads WHERE id = ?;', db, [req.params.id]);
-    
-    res.json({ success: true, message: 'Test upload deleted from S3 and database' });
-  } catch (error) {
-    console.error('Delete error:', error);
-    res.status(500).json({ error: 'Delete failed', details: error.message });
-  }
-});
-
-
 /**
  * Minutes object: 
  * {
@@ -821,13 +730,14 @@ app.get('/reset', (req, res) => {
     db.run('DROP TABLE IF EXISTS article_images;');
     db.run('DROP TABLE IF EXISTS members;');
     db.run('DROP TABLE IF EXISTS minutes;');
+    db.run('DROP TABLE IF EXISTS events;');
 
     // create tables
     db.run('CREATE TABLE articles (id TEXT PRIMARY KEY, title TEXT, date TEXT, text TEXT, is_event INTEGER, is_aid INTEGER, is_guest INTEGER, is_project INTEGER, is_home INTEGER, is_sport INTEGER);');
     db.run('CREATE TABLE article_images (id TEXT PRIMARY KEY, article TEXT, image TEXT);');
     db.run('CREATE TABLE members (id TEXT PRIMARY KEY, name TEXT, image TEXT, position TEXT, role TEXT, "order" INTEGER);');
     db.run('CREATE TABLE minutes (id TEXT PRIMARY KEY, title TEXT, file TEXT, date TEXT, description TEXT, "order" INTEGER);');
-    db.run('CREATE TABLE test_uploads (id TEXT PRIMARY KEY, file_name TEXT, s3_url TEXT, s3_key TEXT, uploaded_at TEXT, test_data TEXT);');
+    db.run('CREATE TABLE events (id TEXT PRIMARY KEY, title TEXT, description TEXT, timestamp TEXT, location TEXT, contact TEXT, recurring TEXT, image TEXT);');
 
     // insert default data
     db.run('INSERT INTO members (id, name, image, position, "order") VALUES (?, ?, ?, ?, ?);', [uuidv4(), 'John Doe', 'john-doe.jpg', 'CEO', 1]);
@@ -847,7 +757,11 @@ app.get('/reset', (req, res) => {
 
 const getEvents = async () => {
   const events = await dbAllAsync('SELECT * FROM events;', db);
-  return events;
+  // Add S3 URLs to event images
+  return events.map(event => ({
+    ...event,
+    image: getS3Url("event", event.image)
+  }));
 }
 
 const getEvent = async (id) => {
@@ -855,6 +769,9 @@ const getEvent = async (id) => {
     db.get('SELECT * FROM events WHERE id = ?;', [id], (err, row) => {
       if (err) {
         return reject(err);
+      }
+      if (row) {
+        row.image = getS3Url('event', row.image);
       }
       resolve(row);
     });
@@ -865,21 +782,40 @@ const createEvent = async (event) => {
   const eventId = uuidv4();
 
   db.serialize(() => {
-    db.run('INSERT INTO events (id, title, description, timestamp, location, contact, recurring) VALUES (?, ?, ?, ?, ?, ?, ?);', [eventId, event.title, event.description, event.timestamp, event.location, event.contact, event.recurring]);
+    db.run('INSERT INTO events (id, title, description, timestamp, location, contact, recurring, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?);', [eventId, event.title, event.description, event.timestamp, event.location, event.contact, event.recurring, event.image]);
   });
 
   return eventId;
 };
 
 const deleteEvent = async (id) => {
-  db.serialize(() => {
-    db.run('DELETE from events where events.id=?', [id]);
-  });
+  try {
+    // Get event to find image S3 key for deletion
+    const event = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM events WHERE id = ?;', [id], (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    });
+    
+    // Delete image from S3 if it exists
+    if (event && event.image) {
+      await deleteFromS3(event.image);
+    }
+    
+    // Delete from database
+    db.serialize(() => {
+      db.run('DELETE from events where events.id=?', [id]);
+    });
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    throw error;
+  }
 }
 
 const updateEvent = async (event) => {
   db.serialize(() => {
-    db.run('UPDATE events SET title = ?, description = ?, timestamp = ?, location = ?, contact = ?, recurring = ? WHERE id = ?;', [event.title, event.description, event.timestamp, event.location, event.contact, event.recurring, event.id]);
+    db.run('UPDATE events SET title = ?, description = ?, timestamp = ?, location = ?, contact = ?, recurring = ?, image = ? WHERE id = ?;', [event.title, event.description, event.timestamp, event.location, event.contact, event.recurring, event.image, event.id]);
   });
   return event.id;
 }
@@ -904,40 +840,78 @@ app.get('/events', (req, res) => {
   });
 })
 
-app.post("/events", async (req, res) => {
-  const event = {
-    id: req.body?.id,
-    title: req.body?.title,
-    description: req.body?.description,
-    timestamp: req.body?.timestamp,
-    location: req.body?.location,
-    contact: req.body?.contact,
-    recurring: req.body?.recurring,
-  };
+app.post("/events", upload.single("image"), async (req, res) => {
+  try {
+    let imageS3Path = req?.body?.existing_image; // Keep existing image if no new one uploaded
+    
+    // Upload new image to S3 if provided
+    if (req.file) {
+      const s3Result = await uploadToS3(req.file, 'media/images/events');
+      imageS3Path = s3Result.fileName; // Store the S3 key/path in database
+    }
 
-  let eventId;
-  if (event?.id) {
-    eventId = await updateEvent(event);
-  } else {
-    eventId = await createEvent(event);
+    const event = {
+      id: req.body?.id,
+      title: req.body?.title,
+      description: req.body?.description,
+      timestamp: req.body?.timestamp,
+      location: req.body?.location,
+      contact: req.body?.contact,
+      recurring: req.body?.recurring,
+      image: imageS3Path,
+    };
+
+    let eventId;
+    if (event?.id) {
+      eventId = await updateEvent(event);
+    } else {
+      eventId = await createEvent(event);
+    }
+
+    const eventResponse = await getEvent(eventId);
+    res.json(eventResponse);
+    
+  } catch (error) {
+    console.error('Event upload error:', error);
+    res.status(500).json({ 
+      error: 'Event upload failed', 
+      details: error.message 
+    });
   }
-
-  const eventResponse = await getEvent(eventId);
-
-  res.json(eventResponse);
 });
 
-app.put("/event/:id", async (req, res) => {
-  const event = {
-    id: req.body?.id,
-    title: req.body?.title,
-    description: req.body?.description,
-    location: req.body?.location,
-    contact: req.body?.contact,
-  };
+app.put("/event/:id", upload.single("image"), async (req, res) => {
+  try {
+    let imageS3Path = req?.body?.existing_image; // Keep existing image if no new one uploaded
+    
+    // Upload new image to S3 if provided
+    if (req.file) {
+      const s3Result = await uploadToS3(req.file, 'media/images/events');
+      imageS3Path = s3Result.fileName; // Store the S3 key/path in database
+    }
 
-  const updatedMember = await updateEvent(event);
-  res.json(updatedMember);
+    const event = {
+      id: req.body?.id,
+      title: req.body?.title,
+      description: req.body?.description,
+      timestamp: req.body?.timestamp,
+      location: req.body?.location,
+      contact: req.body?.contact,
+      recurring: req.body?.recurring,
+      image: imageS3Path,
+    };
+
+    const updatedEvent = await updateEvent(event);
+    const eventResponse = await getEvent(event?.id);
+    res.json(eventResponse);
+    
+  } catch (error) {
+    console.error('Event update error:', error);
+    res.status(500).json({ 
+      error: 'Event update failed', 
+      details: error.message 
+    });
+  }
 });
 
 app.delete('/event/:id', async(req, res ) => 
@@ -1029,9 +1003,8 @@ app.get('/migrate', async (req, res) => {
   await dbRunAsync('CREATE TABLE article_images (id TEXT PRIMARY KEY, article TEXT, image TEXT);', db);
   await dbRunAsync('CREATE TABLE members (id TEXT PRIMARY KEY, name TEXT, image TEXT, role TEXT, position TEXT, "order" INTEGER);', db);
   await dbRunAsync('CREATE TABLE minutes (id TEXT PRIMARY KEY, "title" TEXT, file TEXT, description TEXT, date TEXT);', db);
-  await dbRunAsync('CREATE TABLE events (id TEXT PRIMARY KEY, title TEXT, description TEXT, timestamp TEXT, "location" TEXT, "contact" TEXT, recurring TEXT);', db);
+  await dbRunAsync('CREATE TABLE events (id TEXT PRIMARY KEY, title TEXT, description TEXT, timestamp TEXT, "location" TEXT, "contact" TEXT, recurring TEXT, image TEXT);', db);
   await dbRunAsync('CREATE TABLE login (id TEXT PRIMARY KEY, username TEXT, password TEXT);', db);
-  await dbRunAsync('CREATE TABLE test_uploads (id TEXT PRIMARY KEY, file_name TEXT, s3_url TEXT, s3_key TEXT, uploaded_at TEXT, test_data TEXT);', db);
 
   articles.forEach(async article => {
     const articleId = uuidv4();
@@ -1135,7 +1108,13 @@ app.get('/home', async (req, res) => {
   const memeberPresident = await dbAllAsync('SELECT * FROM members WHERE position = "President and Trustee" LIMIT 1;', db);
   const memberVicePresident = await dbAllAsync('SELECT * FROM members WHERE position = "Vice President" LIMIT 2;', db);
   const memberCoordinator = await dbAllAsync('SELECT * FROM members WHERE position = "Coordinator" LIMIT 1;', db);
-  const events = await dbAllAsync('SELECT * FROM events ORDER BY timestamp DESC LIMIT 3;', db);
+  const eventsRaw = await dbAllAsync('SELECT * FROM events ORDER BY timestamp DESC LIMIT 3;', db);
+  
+  // Add S3 URLs to event images
+  const events = eventsRaw.map(event => ({
+    ...event,
+    image: getS3Url('event', event.image)
+  }));
 
   // Add S3 URLs to member images
   const addS3UrlToMembers = (members) => {

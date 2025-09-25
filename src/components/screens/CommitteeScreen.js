@@ -11,6 +11,7 @@ const CommitteeScreen = () => {
     trustee: [],
     members: [],
     volunteers: [],
+    founders: [],
   });
 
 
@@ -22,12 +23,14 @@ const CommitteeScreen = () => {
         const trustee = response.filter(member => member.role === 'Trustee');
         const members = response.filter(member => member.role === 'Member');
         const volunteers = response.filter(member => member.role === 'Volunteer');
+        const founders = response.filter(member => member.role === 'Founder');
         setCommittee({
           management,
           advisors,
           trustee,
           members,
-          volunteers
+          volunteers,
+          founders
         });
       })
   }, []);
@@ -64,6 +67,11 @@ const CommitteeScreen = () => {
         />
         <h1 className="font-lora mb-8">Committee</h1>
       </div>
+      {section(
+        'Founders',
+        'Our founders are the visionaries who established the organisation. They laid the foundation and set the mission that continues to guide us today. We are grateful for their foresight and dedication.',
+        committee.founders,
+      )}
       {section(
         'Management',
         'The management team is responsible for the day-to-day running of the organisation. They are responsible for the strategic direction of the organisation and ensuring that the organisation meets its objectives.',

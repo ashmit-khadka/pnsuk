@@ -96,6 +96,7 @@ const MemberForm = (props) => {
             required: "Select the member role"
           }}
           options={[
+            { value: "Founder", label: "Founder" },
             { value: "Management", label: "Management" },
             { value: "Trustee", label: "Trustee" },
             { value: "Volunteer", label: "Volunteer" },

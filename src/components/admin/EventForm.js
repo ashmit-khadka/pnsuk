@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from 'react-router';
 import { useNavigate } from "react-router";
@@ -6,6 +6,7 @@ import { deleteEvent, getEvent } from "../../services/services";
 import FormFieldTextbox from "./form/FormFieldTextbox";
 import FormFieldDate from "./form/FormFieldDate";
 import FormFieldDropdown from "./form/FormFieldDropdown";
+import FormFieldFile from "./form/FormFieldFile";
 import Button from "../Button";
 import { submitEvent } from "../../services/services";
 
@@ -13,20 +14,12 @@ const EventForm = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const isEditMode = state?.id ? true : false;
-  const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm({
-    // defaultValues: {
-    //   title: "Default Title",
-    //   description: "Default Description",
-    //   date: "2024-12-29T09:00:00",
-    //   location: "Location",
-    //   contact: "Contact",
-    //   recurring: "none",
-    // }
-  });
+  const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm();
+
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const onSubmit = async (data) => {
-    const response = await submitEvent(data);
-    //updateForm(response)
+    const response = await submitEvent(data, selectedImage);
     navigate('/admin/dashboard/events');
   };
 
@@ -39,6 +32,11 @@ const EventForm = () => {
       location: event.location,
       contact: event.contact,
       recurring: event.recurring,
+      image: event.image,
+    });
+    setSelectedImage({
+      name: event.image,
+      preview: event.image
     });
   }
 
@@ -120,6 +118,22 @@ const EventForm = () => {
             { value: "monthly", label: "Monthly" },
             { value: "yearly", label: "Yearly" }
           ]}
+        />
+      </div>
+      <div className="mb-4">
+        <FormFieldFile
+          id="image"
+          label="Event Image"
+          register={register}
+          errors={errors}
+          validation={{
+            //required: "Upload the event image"
+          }}
+          selectedFile={selectedImage}
+          setSelectedFile={setSelectedImage}
+          hasImage={true}
+          className="w-full px-3 py-2 border border-themeDark rounded-md"
+          labelClassName="text-themeDark font-bold mb-2"
         />
       </div>
       <div className="flex justify-end gap-4">
