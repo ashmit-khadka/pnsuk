@@ -92,7 +92,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ 
   storage,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 200 * 1024 * 1024, // 200MB limit
   }
 });
 
@@ -387,9 +387,18 @@ app.get('/media/:id', async (req, res) => {
 app.post('/media', upload.single("image"), async (req, res) => {
   try {
     let s3Key = req.body.existing_image;
+    let type = req.body.type; // Keep existing type if not uploading a new file
+
     if (req.file) {
       const s3Result = await uploadToS3(req.file, 'media/images/media');
       s3Key = s3Result.fileName;
+      
+      // Infer type from mimetype
+      if (req.file.mimetype.startsWith('image/')) {
+        type = 'image';
+      } else if (req.file.mimetype.startsWith('video/')) {
+        type = 'video';
+      }
     }
 
     const { id, name, link, is_home, is_gallery } = req.body;
@@ -398,10 +407,10 @@ app.post('/media', upload.single("image"), async (req, res) => {
 
     if (id) {
       // Update
-      await dbRunAsync('UPDATE media SET name = ?, link = ?, s3_key = ?, is_home = ?, is_gallery = ? WHERE id = ?;', db, [name, link, s3Key, isHomeBool, isGalleryBool, id]);
+      await dbRunAsync('UPDATE media SET name = ?, link = ?, s3_key = ?, type = ?, is_home = ?, is_gallery = ? WHERE id = ?;', db, [name, link, s3Key, type, isHomeBool, isGalleryBool, id]);
     } else {
       // Create
-      await dbRunAsync('INSERT INTO media (name, link, s3_key, is_home, is_gallery) VALUES (?, ?, ?, ?, ?);', db, [name, link, s3Key, isHomeBool, isGalleryBool]);
+      await dbRunAsync('INSERT INTO media (name, link, s3_key, type, is_home, is_gallery) VALUES (?, ?, ?, ?, ?, ?);', db, [name, link, s3Key, type, isHomeBool, isGalleryBool]);
     }
     res.status(200).send('Media saved');
   } catch (error) {
@@ -1147,7 +1156,7 @@ app.get('/home', async (req, res) => {
       ORDER BY date DESC
       LIMIT 4;
     `, db);
-  const images = await dbAllAsync('SELECT * FROM media WHERE is_home = 1;', db);
+  const media = await dbAllAsync('SELECT * FROM media WHERE is_home = 1;', db);
   const memeberPresident = await dbAllAsync('SELECT * FROM members WHERE position = "President and Trustee" LIMIT 1;', db);
   const memberVicePresident = await dbAllAsync('SELECT * FROM members WHERE position = "Vice President" LIMIT 2;', db);
   const memberCoordinator = await dbAllAsync('SELECT * FROM members WHERE position = "Coordinator" LIMIT 1;', db);
@@ -1168,7 +1177,7 @@ app.get('/home', async (req, res) => {
   };
 
   const data = {
-    images: images.map(image => ({...image, image: getS3Url('media', image.s3_key)})),
+    media: media.map(item => ({...item, url: getS3Url('media', item.s3_key)})),
     donations: await mapImagesToArticles(donations),
     articles: await mapImagesToArticles(articles),
     members: {

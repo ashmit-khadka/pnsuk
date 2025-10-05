@@ -13,8 +13,14 @@ const MediaForm = () => {
   const navigate = useNavigate();
   const isEditMode = state?.id ? true : false;
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    defaultValues: {
+      is_home: true,
+      is_gallery: true
+    }
+  });
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isEditMode) {
@@ -36,7 +42,9 @@ const MediaForm = () => {
   }, [state, isEditMode, reset]);
 
   const onSubmit = async (data) => {
+    setIsSubmitting(true);
     await submitMedia(data, selectedImage);
+    setIsSubmitting(false);
     navigate('/admin/dashboard/media');
   };
 
@@ -78,6 +86,7 @@ const MediaForm = () => {
           hasImage={true}
           className="w-full px-3 py-2 border border-themeDark rounded-md"
           labelClassName="text-themeDark font-bold mb-2"
+          accept="image/*,video/*"
         />
       </div>
       <div className="mb-4 flex gap-4">
@@ -95,7 +104,9 @@ const MediaForm = () => {
         />
       </div>
       <div className="flex justify-end gap-4">
-        <Button variant="default" type="submit">Save</Button>
+        <Button variant="default" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving...' : 'Save'}
+        </Button>
         <Button variant="default" type="button" onClick={() => navigate(-1)}>Cancel</Button>
         {isEditMode && (
           <Button variant="red" type="button" onClick={() => onDelete(state.id)}>Delete</Button>

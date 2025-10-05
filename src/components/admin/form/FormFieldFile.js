@@ -3,7 +3,7 @@ import Button from "../../Button";
 import { has } from "lodash";
 
 const FormFieldFile = (props) => {
-  const { id, label, register, errors, validation, selectedFile, setSelectedFile, hasImage = false, labelClassName } = props;
+  const { id, label, register, errors, validation, selectedFile, setSelectedFile, hasImage = false, labelClassName, accept } = props;
   const fileInputRef = useRef(null);
 
   const fileImage = hasImage ? (selectedFile?.image || selectedFile?.preview) : `${process.env.REACT_APP_HOST}/assets/media/images/defaults/file.jpeg`;
@@ -34,9 +34,9 @@ const FormFieldFile = (props) => {
 
   const getButtonLabel = () => {
     if (selectedFile?.name) {
-      return hasImage ? 'Change Image' : 'Change File';
+      return hasImage ? 'Change Media' : 'Change File';
     }
-    return hasImage ? 'Add Image +' : 'Add File +';
+    return hasImage ? 'Add Media +' : 'Add File +';
   };
 
   return (
@@ -48,6 +48,7 @@ const FormFieldFile = (props) => {
         onChange={handleFileChange}
         ref={fileInputRef}
         style={{ display: 'none' }}
+        accept={accept}
       />
 
       <Button type="button" onClick={handleClick}>

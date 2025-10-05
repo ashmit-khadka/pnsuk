@@ -73,7 +73,10 @@ const Button = ({
       onClick={onClick}
       disabled={disabled}
       className={`${baseStyles} ${sizes[size]} ${className}`}
-      style={styles[variant]}
+      style={{
+        ...styles[variant],
+        ...(disabled && { backgroundColor: '#cccccc', color: '#666666', cursor: 'not-allowed' })
+      }}
     >
       {children}
     </button>

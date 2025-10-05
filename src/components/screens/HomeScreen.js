@@ -38,7 +38,7 @@ const HomeScreen = () => {
     image
   }) => (
     <div className="flex flex-col items-center text-center px-2">
-      <img className="rounded-full mb-2" src={image} alt="placeholder" style={{ width: '140px', height: '140px' }}/>
+      <img className="rounded-full mb-2" src={image} alt="placeholder" style={{ width: '140px', height: '140px' }} />
       <p className="font-bold m-0 mt-2">{title}</p>
       <p className="m-0">{description}</p>
     </div>
@@ -88,16 +88,30 @@ const HomeScreen = () => {
 
         <div className="col-span-4 relative" style={{ rounded: '50%' }}>
           {/* <img className="w-full h-96 object-cover rounded-lg" src={`${process.env.REACT_APP_HOST}/assets/media/images/banner.png`} alt="placeholder" /> */}
-          
-          <Carousel>
-            {data?.images?.map((image) =>
-              <Carousel.Item className="" key={image.id}>
-                <img className="w-full h-96 object-cover" style={{ borderRadius: '2rem' }} key={image.id} src={image.image} alt={image.title} />
-
-              </Carousel.Item>
-            )
-            }
-          </Carousel>
+          {data?.media?.length > 0 && (
+            <Carousel>
+              {data?.media?.map((item) => {
+                const url = item.link && (item.link.startsWith('http://') || item.link.startsWith('https://')) ? item.link : `https://${item.link}`;
+                return (
+                  <Carousel.Item className="" key={item.id}>
+                    <a href={item.link ? url : undefined} target="_blank" rel="noopener noreferrer">
+                      {item.type === 'video' ? (
+                        <video className="w-full h-96 object-cover" style={{ borderRadius: '2rem' }} autoPlay loop muted>
+                          <source src={item.url} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : (
+                        <img className="w-full h-96 object-cover" style={{ borderRadius: '2rem' }} src={item.url} alt={item.name} />
+                      )}
+                      <Carousel.Caption>
+                        <h3>{item.name}</h3>
+                      </Carousel.Caption>
+                    </a>
+                  </Carousel.Item>
+                )
+              })}
+            </Carousel>
+          )}
           {/* <IconHighlight style={{
             width: '10rem',
             position: 'absolute',
@@ -191,46 +205,49 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      <div className="relative bg-themeAltLight w-full pt-4 px-8 pb-8 flex flex-col gap-8 items-center mb-16"
-        style={{
-          backgroundImage: `linear-gradient(rgba(255, 168, 168, 0.9),rgba(255, 168, 168, 0.9)), url(${process.env.REACT_APP_HOST}/assets/media/images/screens/pexels-photo-3714145.jpeg)`,
-          backgroundSize: 'cover', // Adjust the size of the background image
-          backgroundPosition: 'center', // Center the background image
-          backgroundRepeat: 'no-repeat', // Prevent the background image from repeating
-          backgroundColor: 'rgba(192, 74, 74, 0.5)', // Semi-transparent background color
+      {data?.members?.president && data?.members?.coordinator && data?.members?.vicePresident.length > 0 && (
+        <div className="relative bg-themeAltLight w-full pt-4 px-8 pb-8 flex flex-col gap-8 items-center mb-16"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255, 168, 168, 0.9),rgba(255, 168, 168, 0.9)), url(${process.env.REACT_APP_HOST}/assets/media/images/screens/pexels-photo-3714145.jpeg)`,
+            backgroundSize: 'cover', // Adjust the size of the background image
+            backgroundPosition: 'center', // Center the background image
+            backgroundRepeat: 'no-repeat', // Prevent the background image from repeating
+            backgroundColor: 'rgba(192, 74, 74, 0.5)', // Semi-transparent background color
 
-        }}
-      >
-        <h2 className="font-lora text-4xl font-bold text-center p-4">Meet our team</h2>
-        <div className="max-w-page grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
-          <Member
-            name={data?.members?.president?.name}
-            position={data?.members?.president?.position}
-            image={data?.members?.president?.image}
-            imageSize="large"
-          />
-          {
-            data?.members?.vicePresident.map((vp) => (
-              <Member
-                key={vp.id}
-                name={vp.name}
-                position={vp.position}
-                image={vp.image}
-                imageSize="large"
-              />
-            ))
-          }
-          <Member
-            name={data?.members?.coordinator?.name}
-            position={data?.members?.coordinator?.position}
-            image={data?.members?.coordinator?.image}
-            imageSize="large"
-          />
+          }}
+        >
+          <h2 className="font-lora text-4xl font-bold text-center p-4">Meet our team</h2>
+          <div className="max-w-page grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
+            <Member
+              name={data?.members?.president?.name}
+              position={data?.members?.president?.position}
+              image={data?.members?.president?.image}
+              imageSize="large"
+            />
+            {
+              data?.members?.vicePresident.map((vp) => (
+                <Member
+                  key={vp.id}
+                  name={vp.name}
+                  position={vp.position}
+                  image={vp.image}
+                  imageSize="large"
+                />
+              ))
+            }
+            <Member
+              name={data?.members?.coordinator?.name}
+              position={data?.members?.coordinator?.position}
+              image={data?.members?.coordinator?.image}
+              imageSize="large"
+            />
+          </div>
+          <Button variant="darkRed" onClick={() => console.log('clicked')}>
+            View more
+          </Button>
         </div>
-        <Button variant="darkRed" onClick={() => console.log('clicked')}>
-          View more
-        </Button>
-      </div>
+
+      )}
 
       <div className="max-w-page grid grid-cols-1 lg:grid-cols-3 gap-24 w-full mb-16">
         <div className="col-span-1 md:col-span-2 grid gap-16 grid-cols-1 grid-rows-4 md:grid-cols-2 md:grid-rows-2">
