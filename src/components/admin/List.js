@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { getAllArticles, getAllMinutes, getAllEvents, getAllMembers } from '../../services/services';
+import { getAllArticles, getAllMinutes, getAllEvents, getAllMembers, getMedia } from '../../services/services';
 import Button from '../Button';
 import moment from 'moment';
 
@@ -40,6 +40,29 @@ const List = ({ elementType = 'minute' }) => {
             editButtonLink: "/admin/article",
           };
           break;
+        case 'media':
+            const media = await getMedia();
+            data = media.map(item => ({
+              data: item,
+              columns: {
+                name: <div className="font-bold">{item.name}</div>,
+                image: <img 
+                  className="w-16 h-16 object-cover rounded-full"
+                  src={item.s3_key} 
+                  alt={item.name}
+                />,
+                link: item.link,
+                home: item.is_home ? 'Yes' : 'No',
+                gallery: item.is_gallery ? 'Yes' : 'No',
+              },
+              searchFilds: ['name', 'link'],
+            }));
+            buttonLinks = {
+              addButtonText: 'Add Media',
+              addButtonLink: "/admin/media",
+              editButtonLink: "/admin/media",
+            };
+            break;
         case 'minutes':
           const minutes = await getAllMinutes();
           data = minutes.map(minute => ({

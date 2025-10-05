@@ -90,9 +90,9 @@ const HomeScreen = () => {
           {/* <img className="w-full h-96 object-cover rounded-lg" src={`${process.env.REACT_APP_HOST}/assets/media/images/banner.png`} alt="placeholder" /> */}
           
           <Carousel>
-            {data?.images?.map((article) =>
-              <Carousel.Item className="" key={article.id}>
-                <img className="w-full h-96 object-cover" style={{ borderRadius: '2rem' }} key={article.id} src={article.images[0].image} alt={article.title} />
+            {data?.images?.map((image) =>
+              <Carousel.Item className="" key={image.id}>
+                <img className="w-full h-96 object-cover" style={{ borderRadius: '2rem' }} key={image.id} src={image.image} alt={image.title} />
 
               </Carousel.Item>
             )

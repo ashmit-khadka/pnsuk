@@ -19,7 +19,7 @@ const adminLinks = [
   { path: "/admin/dashboard/events", label: "Events" },
   { path: "/admin/dashboard/committee", label: "Committee" },
   { path: "/admin/dashboard/minutes", label: "Minutes" },
-  { path: "/admin/s3-test", label: "S3 Test" },
+  { path: "/admin/dashboard/media", label: "Media" },
 ];
 
 const NavItem = ({ to, children, onNavigate, isActive, isMobile = false }) => {

@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import formModeEnum from "./formModeEnum";
 import { convertToISOFormat } from "./formatDate";
@@ -261,6 +260,55 @@ const deleteMinute = async (id) => {
   }
 }
 
+const getMedia = async () => {
+  const response = await axios.get(`${process.env.REACT_APP_API}/media`);
+  return response.data;
+}
+
+const getMediaItem = async (id) => {
+  const response = await axios.get(`${process.env.REACT_APP_API}/media/${id}`);
+  return response.data;
+}
+
+const submitMedia = async (data, image) => {
+  const formData = new FormData();
+
+  if (data?.id) {
+    formData.append("id", data.id);
+  }
+
+  formData.append("name", data.name);
+  formData.append("link", data.link);
+  formData.append("is_home", data.is_home);
+  formData.append("is_gallery", data.is_gallery);
+
+  if (image?.file) {
+    formData.append("image", image.file);
+  } else {
+    formData.append("existing_image", data.image);
+  }
+
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API}/media`, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
+    toast.success(`Media ${data?.id ? 'updated' : 'created'} successfully`);
+    return response.data;
+  } catch (error) {
+    toast.error(`Error saving media`);
+  }
+};
+
+const deleteMedia = async (id) => {
+  try {
+    const response = await axios.delete(`${process.env.REACT_APP_API}/media/${id}`);
+    toast.success(`Media deleted successfully`);
+    return response.data;
+  } catch (error) {
+    toast.error(`Error deleting media`);
+  }
+}
+
 
 
 
@@ -284,5 +332,9 @@ export {
   deleteMember,
   deleteArticle,
   deleteEvent,
-  deleteMinute
+  deleteMinute,
+  getMedia,
+  getMediaItem,
+  submitMedia,
+  deleteMedia
 }

@@ -12,6 +12,7 @@ const https = require('https');
 const http = require('http');
 const AWS = require('aws-sdk');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
+const { getS3Url: getS3UrlUtil } = require('./utils/s3');
 
 
 const defaultEvents = require('./backup/defaults/events.json');
@@ -27,6 +28,10 @@ AWS.config.update({
 const s3 = new AWS.S3();
 const bucketName = process.env.S3_BUCKET_NAME;
 const environment = process.env.NODE_ENV || 'development';
+
+const getS3Url = (type, s3Key) => {
+  return getS3UrlUtil(type, s3Key, bucketName, process.env.AWS_REGION);
+}
 
 // Helper function to upload file to S3
 const uploadToS3 = async (file, objectType) => {
@@ -48,38 +53,6 @@ const uploadToS3 = async (file, objectType) => {
     s3Key: result.Key,
     fileName: fileName
   };
-};
-
-// Helper function to convert S3 key to full URL
-const getS3Url = (type, s3Key) => {
-  if (!s3Key) return null;
-  if (s3Key.startsWith('http')) return s3Key; // Already a full URL
-  
-  // Special handling for member images - redirect to S3 committee folder with correct path
-  if (type === 'member' && s3Key) {
-    // Extract just the filename from the S3 key
-    const fileName = s3Key.split('/').pop();
-    return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/images/committee/${fileName}`;
-  }
-
-  if (type === 'article' && s3Key) {
-  
-    const fileName = s3Key.split('/').pop();
-    return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/images/articles/${fileName}`;
-  }
-
-  if (type === 'minute' && s3Key) {
-    const fileName = s3Key.split('/').pop();
-    return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/docs/minutes/${fileName}`;
-  }
-
-  if (type === 'event' && s3Key) {
-    const fileName = s3Key.split('/').pop();
-    return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/prod/assets/media/images/events/${fileName}`;
-  }
-
-  // For articles and minutes, use the regular S3 path
-  return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
 };
 
 // Helper function to delete file from S3
@@ -381,6 +354,76 @@ app.delete('/article/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete article', details: error.message });
   }
 });
+
+app.get('/media', async (req, res) => {
+  try {
+    const media = await dbAllAsync('SELECT * FROM media;', db);
+    const mediaWithUrls = media.map(item => ({
+      ...item,
+      s3_key: getS3Url('media', item.s3_key)
+    }));
+    res.json(mediaWithUrls);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/media/:id', async (req, res) => {
+  try {
+    const item = (await dbAllAsync('SELECT * FROM media WHERE id = ?;', db, [req.params.id]))[0];
+    if (item) {
+      item.s3_key = getS3Url('media', item.s3_key);
+      res.json(item);
+    } else {
+      res.status(404).send('Media not found');
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/media', upload.single("image"), async (req, res) => {
+  try {
+    let s3Key = req.body.existing_image;
+    if (req.file) {
+      const s3Result = await uploadToS3(req.file, 'media/images/media');
+      s3Key = s3Result.fileName;
+    }
+
+    const { id, name, link, is_home, is_gallery } = req.body;
+    const isHomeBool = is_home === 'true' ? 1 : 0;
+    const isGalleryBool = is_gallery === 'true' ? 1 : 0;
+
+    if (id) {
+      // Update
+      await dbRunAsync('UPDATE media SET name = ?, link = ?, s3_key = ?, is_home = ?, is_gallery = ? WHERE id = ?;', db, [name, link, s3Key, isHomeBool, isGalleryBool, id]);
+    } else {
+      // Create
+      await dbRunAsync('INSERT INTO media (name, link, s3_key, is_home, is_gallery) VALUES (?, ?, ?, ?, ?);', db, [name, link, s3Key, isHomeBool, isGalleryBool]);
+    }
+    res.status(200).send('Media saved');
+  } catch (error) {
+    console.error('Media upload error:', error);
+    res.status(500).json({ error: 'Media upload failed', details: error.message });
+  }
+});
+
+app.delete('/media/:id', async (req, res) => {
+  try {
+    const item = (await dbAllAsync('SELECT * FROM media WHERE id = ?;', db, [req.params.id]))[0];
+    if (item && item.s3_key) {
+      await deleteFromS3(item.s3_key);
+    }
+    await dbRunAsync('DELETE FROM media WHERE id = ?;', db, [req.params.id]);
+    res.status(200).send('Media deleted');
+  } catch (error) {
+    console.error('Error deleting media:', error);
+    res.status(500).json({ error: 'Failed to delete media', details: error.message });
+  }
+});
+
 
 app.put('/articles/clear', (req, res) => {
   db.serialize(() => {
@@ -1104,7 +1147,7 @@ app.get('/home', async (req, res) => {
       ORDER BY date DESC
       LIMIT 4;
     `, db);
-  const images = await dbAllAsync('SELECT * FROM articles WHERE is_home = 1;', db);
+  const images = await dbAllAsync('SELECT * FROM media WHERE is_home = 1;', db);
   const memeberPresident = await dbAllAsync('SELECT * FROM members WHERE position = "President and Trustee" LIMIT 1;', db);
   const memberVicePresident = await dbAllAsync('SELECT * FROM members WHERE position = "Vice President" LIMIT 2;', db);
   const memberCoordinator = await dbAllAsync('SELECT * FROM members WHERE position = "Coordinator" LIMIT 1;', db);
@@ -1125,7 +1168,7 @@ app.get('/home', async (req, res) => {
   };
 
   const data = {
-    images: await mapImagesToArticles(images),
+    images: images.map(image => ({...image, image: getS3Url('media', image.s3_key)})),
     donations: await mapImagesToArticles(donations),
     articles: await mapImagesToArticles(articles),
     members: {
