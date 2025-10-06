@@ -410,7 +410,8 @@ app.post('/media', upload.single("image"), async (req, res) => {
       await dbRunAsync('UPDATE media SET name = ?, link = ?, s3_key = ?, type = ?, is_home = ?, is_gallery = ? WHERE id = ?;', db, [name, link, s3Key, type, isHomeBool, isGalleryBool, id]);
     } else {
       // Create
-      await dbRunAsync('INSERT INTO media (name, link, s3_key, type, is_home, is_gallery) VALUES (?, ?, ?, ?, ?, ?);', db, [name, link, s3Key, type, isHomeBool, isGalleryBool]);
+      const createdAt = new Date().toISOString();
+      await dbRunAsync('INSERT INTO media (name, link, s3_key, type, is_home, is_gallery, created_at) VALUES (?, ?, ?, ?, ?, ?, ?);', db, [name, link, s3Key, type, isHomeBool, isGalleryBool, createdAt]);
     }
     res.status(200).send('Media saved');
   } catch (error) {
@@ -1131,6 +1132,44 @@ app.post('/login', async (req, res) => {
     res.status(200).send('Login successful');
   } else {
     res.status(401).send('Login failed');
+  }
+});
+
+app.get('/gallery', async (req, res) => {
+  try {
+    // 1. Get all images from article_images and join with articles to get the date
+    const articleImagesRaw = await dbAllAsync(`
+      SELECT ai.id, ai.image, a.date
+      FROM article_images ai
+      JOIN articles a ON ai.article = a.id
+      ORDER BY a.date DESC;
+    `, db);
+
+    const articleImages = articleImagesRaw.map(img => ({
+      id: img.id,
+      s3_key: getS3Url('article', img.image),
+      type: 'image',
+      name: 'Article Image', // Placeholder name
+      date: img.date
+    }));
+
+    // 2. Get all media items marked for gallery
+    const mediaItemsRaw = await dbAllAsync('SELECT * FROM media WHERE is_gallery = 1 ORDER BY created_at DESC;', db);
+    const mediaItems = mediaItemsRaw.map(item => ({
+      ...item,
+      s3_key: getS3Url('media', item.s3_key),
+      date: item.created_at // Assuming media has a created_at timestamp
+    }));
+
+    // 3. Combine and sort by date
+    const galleryItems = [...mediaItems, ...articleImages];
+    galleryItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.json(galleryItems);
+
+  } catch (error) {
+    console.error('Error fetching gallery data:', error);
+    res.status(500).json({ error: 'Failed to fetch gallery data', details: error.message });
   }
 });
 
