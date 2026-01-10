@@ -1243,22 +1243,10 @@ app.get('/article-screen/:id', async (req, res) => {
   res.json(data);  
 });
 
-if (process.env.NODE_ENV === 'development') {
-  // Create HTTP server
-  http.createServer(app).listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-  });
-} else {
-  const options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/pnsuk.org/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/pnsuk.org/fullchain.pem')
-  };
-
-  // Create HTTPS server
-  https.createServer(options, app).listen(port, () => {
-    console.log(`Server is running on https://localhost:${port}`);
-  });
-}
+// Always use HTTP - Nginx handles SSL termination
+http.createServer(app).listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
 
 
 // // Start the server
