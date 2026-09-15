@@ -21,6 +21,7 @@ import { LoginProvider } from './LoginContext';
 import SoonScreen from './components/screens/SoonScreen';
 import GalleryScreen from './components/screens/GalleryScreen';
 import MediaForm from './components/admin/MediaForm';
+import DonateScreen from './components/screens/DonateScreen';
 
 const Layout = () => (
   <div className="flex flex-col items-center pt-24">
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
       { path: 'about', element: <AboutScreen /> },
       { path: 'soon', element: <SoonScreen /> },
       { path: 'gallery', element: <GalleryScreen /> },
+      { path: 'donate', element: <DonateScreen /> },
       {
         element: <ProtectedRoute />,
         children: [

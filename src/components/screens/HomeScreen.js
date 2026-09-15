@@ -90,7 +90,7 @@ const HomeScreen = () => {
           {/* <img className="w-full h-96 object-cover rounded-lg" src={`${process.env.REACT_APP_HOST}/assets/media/images/banner.png`} alt="placeholder" /> */}
           {data?.media?.length > 0 && (
             <Carousel>
-              {data?.media?.map((item) => {
+              {data?.media?.slice().reverse().map((item) => {
                 const url = item.link && (item.link.startsWith('http://') || item.link.startsWith('https://')) ? item.link : `https://${item.link}`;
                 return (
                   <Carousel.Item className="" key={item.id}>

@@ -5,6 +5,7 @@ import LoginContext from "../LoginContext";
 import Cookies from "js-cookie";
 
 const mainLinks = [
+  { path: "/donate", label: "Donate ❤️" },
   { path: "/", label: "Home" },
   { path: "/events", label: "Events" },
   { path: "/projects", label: "Projects" },
@@ -23,6 +24,18 @@ const adminLinks = [
 ];
 
 const NavItem = ({ to, children, onNavigate, isActive, isMobile = false }) => {
+  const isDonate = to === "/donate";
+  
+  let bgClasses = isActive 
+    ? "text-white bg-themeDark" 
+    : "text-white bg-themePrimary hover:bg-themeDark";
+    
+  if (isDonate) {
+    bgClasses = isActive 
+      ? "text-white bg-red-700" 
+      : "text-white bg-red-600 hover:bg-red-700 font-bold shadow-sm";
+  }
+
   return (
     <a
       href={to}
@@ -30,9 +43,9 @@ const NavItem = ({ to, children, onNavigate, isActive, isMobile = false }) => {
         e.preventDefault();
         onNavigate(to);
       }}
-      className={`no-underline text-sm font-medium rounded-md
+      className={`no-underline text-sm font-medium rounded-md transition-colors
         ${isMobile ? "block w-full text-left px-3 py-3" : "px-3 py-2"}
-        ${isActive ? "text-white bg-themeDark" : "text-white bg-themePrimary hover:bg-themeDark"}`}
+        ${bgClasses}`}
       role="menuitem"
     >
       {children}
